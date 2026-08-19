@@ -1,0 +1,22 @@
+[build-system]
+requires = ['setuptools>=69', 'wheel']
+build-backend = 'setuptools.build_meta'
+
+[project]
+name = 'qkit'
+version = '0.1.0'
+requires-python = '>=3.10'
+dependencies = [
+    'numpy>=2.5.0'
+]
+authors = [
+    {name = 'Faris Redza', email = 'faris.redza1999@gmail.com'}
+]
+maintainers = [
+    {name = 'Faris Redza', email = 'faris.redza1999@gmail.com'}
+]
+readme = 'README.md'
+
+[project.urls]
+Homepage = 'https://github.com/FarisRedza/qkit'
+Repository = 'https://github.com/FarisRedza/qkit.git'
