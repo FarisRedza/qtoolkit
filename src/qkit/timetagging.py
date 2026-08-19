@@ -33,6 +33,96 @@ def _get_twofold_coincidences(
 
     return counts
 
+@numba.njit(cache=True)
+def _get_threefold_coincidences(
+        tags_a: np.typing.NDArray[np.int64],
+        tags_b: np.typing.NDArray[np.int64],
+        tags_c: np.typing.NDArray[np.int64],
+        coincidence_window: int
+) -> float:
+    idx_a = 0
+    idx_b = 0
+    idx_c = 0
+    counts = 0
+
+    while (
+        idx_a < len(tags_a)
+        and idx_b < len(tags_b)
+        and idx_c < len(tags_c)
+    ):
+        time_a = tags_a[idx_a]
+        time_b = tags_b[idx_b]
+        time_c = tags_c[idx_c]
+
+        minimum = min(time_a, time_b, time_c)
+        maximum = max(time_a, time_b, time_c)
+
+        if maximum - minimum <= coincidence_window:
+            counts += 1
+            idx_a += 1
+            idx_b += 1
+            idx_c += 1
+
+        elif time_a == minimum:
+            idx_a += 1
+
+        elif time_b == minimum:
+            idx_b += 1
+
+        else:
+            idx_c += 1
+
+    return counts
+
+@numba.njit(cache=True)
+def _get_fourfold_coincidences(
+        tags_a: np.typing.NDArray[np.int64],
+        tags_b: np.typing.NDArray[np.int64],
+        tags_c: np.typing.NDArray[np.int64],
+        tags_d: np.typing.NDArray[np.int64],
+        coincidence_window: int
+) -> float:
+    idx_a = 0
+    idx_b = 0
+    idx_c = 0
+    idx_d = 0
+    counts = 0
+
+    while (
+        idx_a < len(tags_a)
+        and idx_b < len(tags_b)
+        and idx_c < len(tags_c)
+        and idx_d < len(tags_d)
+    ):
+        time_a = tags_a[idx_a]
+        time_b = tags_b[idx_b]
+        time_c = tags_c[idx_c]
+        time_d = tags_d[idx_d]
+
+        minimum = min(time_a, time_b, time_c, time_d)
+        maximum = max(time_a, time_b, time_c, time_d)
+
+        if maximum - minimum <= coincidence_window:
+            counts += 1
+            idx_a += 1
+            idx_b += 1
+            idx_c += 1
+            idx_d += 1
+
+        elif time_a == minimum:
+            idx_a += 1
+
+        elif time_b == minimum:
+            idx_b += 1
+
+        elif time_c == minimum:
+            idx_c += 1
+
+        else:
+            idx_d += 1
+
+    return counts
+
 def get_twofold_coincidences(
         tags_a: typing.Union[list[int], np.typing.NDArray[np.int64]],
         tags_b: typing.Union[list[int], np.typing.NDArray[np.int64]],
@@ -44,5 +134,42 @@ def get_twofold_coincidences(
     return _get_twofold_coincidences(
         tags_a=tags_a,
         tags_b=tags_b,
+        coincidence_window=coincidence_window
+    )
+
+def get_threefold_coincidences(
+        tags_a: typing.Union[list[int], np.typing.NDArray[np.int64]],
+        tags_b: typing.Union[list[int], np.typing.NDArray[np.int64]],
+        tags_c: typing.Union[list[int], np.typing.NDArray[np.int64]],
+        coincidence_window: int
+) -> float:
+    tags_a = np.array(tags_a, dtype=np.int64)
+    tags_b = np.array(tags_b, dtype=np.int64)
+    tags_c = np.array(tags_c, dtype=np.int64)
+
+    return _get_threefold_coincidences(
+        tags_a=tags_a,
+        tags_b=tags_b,
+        tags_c=tags_c,
+        coincidence_window=coincidence_window
+    )
+
+def get_fourfold_coincidences(
+        tags_a: typing.Union[list[int], np.typing.NDArray[np.int64]],
+        tags_b: typing.Union[list[int], np.typing.NDArray[np.int64]],
+        tags_c: typing.Union[list[int], np.typing.NDArray[np.int64]],
+        tags_d: typing.Union[list[int], np.typing.NDArray[np.int64]],
+        coincidence_window: int
+) -> float:
+    tags_a = np.array(tags_a, dtype=np.int64)
+    tags_b = np.array(tags_b, dtype=np.int64)
+    tags_c = np.array(tags_c, dtype=np.int64)
+    tags_d = np.array(tags_d, dtype=np.int64)
+
+    return _get_fourfold_coincidences(
+        tags_a=tags_a,
+        tags_b=tags_b,
+        tags_c=tags_c,
+        tags_d=tags_d,
         coincidence_window=coincidence_window
     )

@@ -5,7 +5,9 @@ from .misc_functions import (
 )
 
 from .timetagging import (
-    get_twofold_coincidences
+    get_twofold_coincidences,
+    get_threefold_coincidences,
+    get_fourfold_coincidences
 )
 
 from .quantum_functions import (
@@ -22,6 +24,8 @@ __all__ = [
     'dB_to_fraction',
 
     'get_twofold_coincidences',
+    'get_threefold_coincidences',
+    'get_fourfold_coincidences',
 
     'qber',
     'qber_from_coincidences',
