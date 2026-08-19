@@ -8,10 +8,24 @@ from .timetagging import (
     get_twofold_coincidences
 )
 
+from .quantum_functions import (
+    qber,
+    qber_from_coincidences,
+    qz,
+    qx,
+    qy
+)
+
 __all__ = [
     'binary_entropy',
     'fraction_to_dB',
     'dB_to_fraction',
 
-    'get_twofold_coincidences'
+    'get_twofold_coincidences',
+
+    'qber',
+    'qber_from_coincidences',
+    'qz',
+    'qx',
+    'qy'
 ]
