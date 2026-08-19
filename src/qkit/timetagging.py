@@ -1,15 +1,14 @@
 import typing
 
 import numpy as np
+import numba
 
-def get_twofold_coincidences(
-        tags_a: typing.Union[list[int], np.typing.NDArray[np.int64]],
-        tags_b: typing.Union[list[int], np.typing.NDArray[np.int64]],
+@numba.njit(cache=True)
+def _get_twofold_coincidences(
+        tags_a: np.typing.NDArray[np.int64],
+        tags_b: np.typing.NDArray[np.int64],
         coincidence_window: int
 ) -> float:
-    tags_a = np.array(tags_a, dtype=np.int64)
-    tags_b = np.array(tags_b, dtype=np.int64)
-
     idx_a = 0
     idx_b = 0
     counts = 0
@@ -33,3 +32,17 @@ def get_twofold_coincidences(
             idx_b += 1
 
     return counts
+
+def get_twofold_coincidences(
+        tags_a: typing.Union[list[int], np.typing.NDArray[np.int64]],
+        tags_b: typing.Union[list[int], np.typing.NDArray[np.int64]],
+        coincidence_window: int
+) -> float:
+    tags_a = np.array(tags_a, dtype=np.int64)
+    tags_b = np.array(tags_b, dtype=np.int64)
+
+    return _get_twofold_coincidences(
+        tags_a=tags_a,
+        tags_b=tags_b,
+        coincidence_window=coincidence_window
+    )
