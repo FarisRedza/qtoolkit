@@ -146,8 +146,8 @@ def get_twofold_coincidences(
     int
         Number of coincidences
     """
-    tags_a = np.array(tags_a, dtype=np.int64)
-    tags_b = np.array(tags_b, dtype=np.int64)
+    tags_a = np.asarray(tags_a, dtype=np.int64)
+    tags_b = np.asarray(tags_b, dtype=np.int64)
 
     return _get_twofold_coincidences(
         tags_a=tags_a,
@@ -181,9 +181,9 @@ def get_threefold_coincidences(
     int
         Number of coincidences
     """
-    tags_a = np.array(tags_a, dtype=np.int64)
-    tags_b = np.array(tags_b, dtype=np.int64)
-    tags_c = np.array(tags_c, dtype=np.int64)
+    tags_a = np.asarray(tags_a, dtype=np.int64)
+    tags_b = np.asarray(tags_b, dtype=np.int64)
+    tags_c = np.asarray(tags_c, dtype=np.int64)
 
     return _get_threefold_coincidences(
         tags_a=tags_a,
@@ -221,10 +221,10 @@ def get_fourfold_coincidences(
     int
         Number of coincidences
     """
-    tags_a = np.array(tags_a, dtype=np.int64)
-    tags_b = np.array(tags_b, dtype=np.int64)
-    tags_c = np.array(tags_c, dtype=np.int64)
-    tags_d = np.array(tags_d, dtype=np.int64)
+    tags_a = np.asarray(tags_a, dtype=np.int64)
+    tags_b = np.asarray(tags_b, dtype=np.int64)
+    tags_c = np.asarray(tags_c, dtype=np.int64)
+    tags_d = np.asarray(tags_d, dtype=np.int64)
 
     return _get_fourfold_coincidences(
         tags_a=tags_a,
