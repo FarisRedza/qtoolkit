@@ -10,8 +10,12 @@ def binary_entropy(p: float) -> float:
 
     Parameters
     ----------
-    x: float
-        x
+    p: float
+        Probability of one of the two outcomes, in the range [0, 1]
+    
+    Returns
+    -------
+    float
     """
     return -p * np.log2(p) - (1-p) * np.log2(1-p)
 
