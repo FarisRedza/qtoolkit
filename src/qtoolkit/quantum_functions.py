@@ -220,7 +220,7 @@ def visibility(max: float, min: float) -> float:
     Calculate visibility
 
     .. math::
-        V = (C_{max} - C_{min}) / (C_{max} + C_{min})
+        V = (C_\\text{max} - C_\\text{min}) / (C_\\text{max} + C_\\text{min})
     
     Parameters
     ----------
