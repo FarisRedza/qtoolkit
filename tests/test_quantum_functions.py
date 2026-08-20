@@ -1,4 +1,4 @@
-import qkit
+import qtoolkit
 import pytest
 
 @pytest.mark.parametrize(
@@ -11,12 +11,12 @@ import pytest
     ],
 )
 def test_qber(correct, incorrect, expected):
-    result = qkit.qber(correct, incorrect)
+    result = qtoolkit.qber(correct, incorrect)
 
     assert result == pytest.approx(expected)
 
 def test_qz_correlated():
-    result = qkit.qz(
+    result = qtoolkit.qz(
         c_hh=450,
         c_hv=25,
         c_vh=25,
@@ -26,7 +26,7 @@ def test_qz_correlated():
     assert result == pytest.approx(0.05)
 
 def test_qz_anticorrelated():
-    result = qkit.qz(
+    result = qtoolkit.qz(
         c_hh=25,
         c_hv=450,
         c_vh=500,
