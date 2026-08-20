@@ -128,6 +128,24 @@ def get_twofold_coincidences(
         tags_b: typing.Union[list[int], np.typing.NDArray[np.int64]],
         coincidence_window: int
 ) -> int:
+    """
+    Get the number of entries in two arrays that are within the coincidence
+    window of each other.
+
+    Parameters
+    ----------
+        tags_a: list[int] | np.typing.NDArray[np.int64]
+            List/array of timetags
+        tags_b: list[int] | np.typing.NDArray[np.int64]
+            List/array of timetags
+        coincidence_window: int
+            The coincidence window (ps)
+    
+    Returns
+    -------
+    int
+        Number of coincidences
+    """
     tags_a = np.array(tags_a, dtype=np.int64)
     tags_b = np.array(tags_b, dtype=np.int64)
 
@@ -143,6 +161,26 @@ def get_threefold_coincidences(
         tags_c: typing.Union[list[int], np.typing.NDArray[np.int64]],
         coincidence_window: int
 ) -> int:
+    """
+    Get the number of entries in three arrays that are within the coincidence
+    window of each other.
+
+    Parameters
+    ----------
+        tags_a: list[int] | np.typing.NDArray[np.int64]
+            List/array of timetags
+        tags_b: list[int] | np.typing.NDArray[np.int64]
+            List/array of timetags
+        tags_c: list[int] | np.typing.NDArray[np.int64]
+            List/array of timetags
+        coincidence_window: int
+            The coincidence window (ps)
+    
+    Returns
+    -------
+    int
+        Number of coincidences
+    """
     tags_a = np.array(tags_a, dtype=np.int64)
     tags_b = np.array(tags_b, dtype=np.int64)
     tags_c = np.array(tags_c, dtype=np.int64)
@@ -161,6 +199,28 @@ def get_fourfold_coincidences(
         tags_d: typing.Union[list[int], np.typing.NDArray[np.int64]],
         coincidence_window: int
 ) -> int:
+    """
+    Get the number of entries in four arrays that are within the coincidence
+    window of each other.
+
+    Parameters
+    ----------
+        tags_a: list[int] | np.typing.NDArray[np.int64]
+            List/array of timetags
+        tags_b: list[int] | np.typing.NDArray[np.int64]
+            List/array of timetags
+        tags_c: list[int] | np.typing.NDArray[np.int64]
+            List/array of timetags
+        tags_d: list[int] | np.typing.NDArray[np.int64]
+            List/array of timetags
+        coincidence_window: int
+            The coincidence window (ps)
+    
+    Returns
+    -------
+    int
+        Number of coincidences
+    """
     tags_a = np.array(tags_a, dtype=np.int64)
     tags_b = np.array(tags_b, dtype=np.int64)
     tags_c = np.array(tags_c, dtype=np.int64)

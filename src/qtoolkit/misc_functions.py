@@ -1,15 +1,18 @@
 import numpy as np
 
-def binary_entropy(x: float) -> float:
+def binary_entropy(p: float) -> float:
     """
-        Binary entropy function
+    Calculate the binary entropy, which quantifies the uncertainty associated
+    with a binary outcome with probability (p).
 
-        Parameters
-        ----------
-        x: float
-            x
+    :math:`H(X) = -p\log_2(p) - (1-p)\log_2(1-p)`
+
+    Parameters
+    ----------
+    x: float
+        x
     """
-    return -x * np.log2(x) - (1-x) * np.log2(1-x)
+    return -p * np.log2(p) - (1-p) * np.log2(1-p)
 
 def fraction_to_dB(x: float) -> float:
     return -10 * np.log10(x)

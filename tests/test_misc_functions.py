@@ -2,7 +2,7 @@ import qtoolkit
 import pytest
 
 def test_binary_entropy() -> None:
-    result = qtoolkit.binary_entropy(x=0.5)
+    result = qtoolkit.binary_entropy(p=0.5)
     assert result == 1
 
 def test_fraction_to_dB() -> None:
