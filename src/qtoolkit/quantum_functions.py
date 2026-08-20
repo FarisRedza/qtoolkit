@@ -69,7 +69,7 @@ def qber_from_coincidences(
         c_11: float
             c_11
 
-        correleated: bool = True
+        correlated: bool = True
             True for correlated, False for anti-correlated
     
     Returns
@@ -106,7 +106,7 @@ def qz(
             c_vh
         c_vv: float
             c_vv
-        correleated: bool = True
+        correlated: bool = True
             True for correlated, False for anti-correlated
     
     Returns
@@ -142,7 +142,7 @@ def qx(
             c_ad
         c_aa: float
             c_aa
-        correleated: bool = True
+        correlated: bool = True
             True for correlated, False for anti-correlated
     
     Returns
@@ -178,7 +178,7 @@ def qy(
             c_lr
         c_ll: float
             c_ll
-        correleated: bool = True
+        correlated: bool = True
             True for correlated, False for anti-correlated
     
     Returns
