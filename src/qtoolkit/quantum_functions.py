@@ -1,3 +1,9 @@
+import typing
+
+import numpy as np
+
+# qber functions
+
 def qber(
         correct: float,
         incorrect: float
@@ -187,3 +193,150 @@ def qy(
         c_11=c_ll,
         correlated=correlated
     )
+
+def qber_from_visibility(visibility: float) -> float:
+    """
+    Calculate QBER from visibility
+
+    .. math:: 
+        QBER = (1 - V)/2
+
+    Parameters
+    ----------
+    visibility: float
+        Visibility
+
+    Returns
+    -------
+    float
+        QBER
+    """
+    return (1 - visibility)/2
+
+# visibility functions
+
+def visibility(max: float, min: float) -> float:
+    """
+    Calculate visibility
+
+    .. math::
+        V = (C_{max} - C_{min}) / (C_{max} + C_{min})
+    
+    Parameters
+    ----------
+    max: float
+        max
+    min: float
+        min
+
+    Returns
+    -------
+    float
+    """
+    return (max - min) / (max + min)
+
+def visibility_from_qber(qber: float) -> float:
+    """
+    Calculate visbility from QBER
+
+    .. math::
+        V = 1 - 2 * \\text{QBER}
+
+    Parameters
+    ----------
+    qber: float
+        QBER
+    
+    Returns
+    -------
+    float
+        Visibility
+    """
+    return 1 - 2 * qber
+
+# singles and coincidences functions
+
+def symmetric_heralding_efficiency(
+        coincidences: float,
+        singles_a: float,
+        singles_b: float
+) -> float:
+    return coincidences / np.sqrt(singles_a * singles_b)
+
+# entanglement functions
+
+def fidelity_from_visibility(
+        visibility_z: float,
+        visibility_x: float,
+        visibility_y: typing.Optional[float] = None
+) -> float:
+    """
+    Estimate Bell-state fidelity from measured visibilities.
+
+    With measurements in all three mutually unbiased bases:
+
+    .. math::
+        F ~= (1 + V_x + V_y + V_z) / 4
+
+    If only X and Z are supplied, this function returns the common
+    two-basis estimate:
+
+    .. math::
+        F ~= (V_x + V_z) / 2
+
+    Parameters
+    ----------
+    visibility_z: float
+        Visibility in the Z basis
+    visibility_x: float
+        Visibility in the X basis
+    visibility_y: float
+        Visibility in the Y basis
+    
+    Returns
+    -------
+    float
+        Fidelity
+    """
+    if visibility_y is None:
+        return (visibility_x + visibility_z) / 2
+
+    return (
+        1
+        + visibility_x
+        + visibility_y
+        + visibility_z
+    ) / 4
+
+def fidelity_from_qber(
+    qx: float,
+    qz: float,
+) -> float:
+    """
+    Two-basis Bell-state fidelity estimate.
+
+    .. math::
+        V = 1 - 2 \\text{QBER}
+
+        F ~= (V_x + V_z) / 2 \\\\
+           = 1 - Q_x - Q_z
+    """
+    return 1 - qx - qz
+
+# denisty matrix functions
+
+def purity(
+        density_matrix: typing.Sequence[typing.Sequence[complex]]
+) -> float:
+    """
+    Calculate quantum-state purity:
+
+    .. math::
+        \\text{P} = \\text{Tr}(ρ^2)
+    """
+    rho = np.asarray(density_matrix, dtype=complex)
+
+    if rho.ndim != 2 or rho.shape[0] != rho.shape[1]:
+        raise ValueError("Density matrix must be square.")
+
+    return float(np.real(np.trace(rho @ rho)))
