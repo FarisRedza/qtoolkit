@@ -94,80 +94,121 @@ class PolarisationChannelMap:
 
 
 @dataclasses.dataclass(frozen=True)
-class BBM92ChannelMap:
-    first: PolarisationChannelMap
-    second: PolarisationChannelMap
+class BasisMetrics:
+    """
+    Metrics calculated from four two-outcome coincidence counts.
 
-    @staticmethod
-    def _basis_pairs(
-        first_0: typing.Optional[int],
-        first_1: typing.Optional[int],
-        second_0: typing.Optional[int],
-        second_1: typing.Optional[int],
-        basis: str
-    ) -> BasisPairs:
-        channels = (
-            first_0,
-            first_1,
-            second_0,
-            second_1,
-        )
+    The coincidence counts correspond to the possible outcomes 00, 01,
+    10, and 11 for a pair of two-outcome measurements.
 
-        if any(channel is None for channel in channels):
-            raise ValueError(
-                f'Both measurement stages must define the {basis} basis.'
-            )
+    Parameters
+    ----------
+    c_00 : int
+        Coincidences between outcome 0 and outcome 0.
+    c_01 : int
+        Coincidences between outcome 0 and outcome 1.
+    c_10 : int
+        Coincidences between outcome 1 and outcome 0.
+    c_11 : int
+        Coincidences between outcome 1 and outcome 1.
+    """
 
-        assert first_0 is not None
-        assert first_1 is not None
-        assert second_0 is not None
-        assert second_1 is not None
+    c_00: int
+    c_01: int
+    c_10: int
+    c_11: int
 
-        return (
-            ChannelPair(first_0, second_0, '00'),
-            ChannelPair(first_0, second_1, '01'),
-            ChannelPair(first_1, second_0, '10'),
-            ChannelPair(first_1, second_1, '11'),
+    @classmethod
+    def from_coincidences(
+            cls,
+            coincidences: dict[tuple[int, int], int],
+            pairs: tuple[
+                ChannelPair,
+                ChannelPair,
+                ChannelPair,
+                ChannelPair,
+            ],
+    ) -> 'BasisMetrics':
+        """
+        Create basis metrics from coincidence data.
+
+        The channel pairs must be supplied in the order 00, 01, 10, 11.
+
+        Parameters
+        ----------
+        coincidences : dict[tuple[int, int], int]
+            Coincidence counts indexed by channel pair.
+        pairs : BasisPairs
+            Channel pairs corresponding to the outcomes 00, 01, 10, and
+            11, respectively.
+
+        Returns
+        -------
+        BasisMetrics
+        """
+        pair_00, pair_01, pair_10, pair_11 = pairs
+
+        return cls(
+            c_00=coincidences[pair_00.as_tuple()],
+            c_01=coincidences[pair_01.as_tuple()],
+            c_10=coincidences[pair_10.as_tuple()],
+            c_11=coincidences[pair_11.as_tuple()],
         )
 
     @property
-    def zz_pairs(self) -> BasisPairs:
-        """
-        Return the H/V coincidence pairs.
-        """
-        return self._basis_pairs(
-            self.first.h,
-            self.first.v,
-            self.second.h,
-            self.second.v,
-            basis='Z',
+    def odd(self) -> int:
+        return self.c_01 + self.c_10
+
+    @property
+    def even(self) -> int:
+        return self.c_00 + self.c_11
+
+    @property
+    def total(self) -> int:
+        return self.odd + self.even
+
+    @property
+    def even_probability(self) -> float:
+        if self.total == 0:
+            return float('nan')
+
+        return self.even / self.total
+
+    @property
+    def odd_probability(self) -> float:
+        if self.total == 0:
+            return float('nan')
+
+        return self.odd / self.total
+
+    @property
+    def qber(self) -> float:
+        return qtoolkit.qber_from_coincidences(
+            c_00=self.c_00,
+            c_01=self.c_01,
+            c_10=self.c_10,
+            c_11=self.c_11,
         )
 
     @property
-    def xx_pairs(self) -> BasisPairs:
-        """
-        Return the D/A coincidence pairs.
-        """
-        return self._basis_pairs(
-            self.first.d,
-            self.first.a,
-            self.second.d,
-            self.second.a,
-            basis='X',
+    def visibility(self) -> float:
+        return qtoolkit.visibility_from_qber(
+            qber=self.qber,
         )
 
-    @property
-    def yy_pairs(self) -> BasisPairs:
-        """
-        Return the R/L coincidence pairs.
-        """
-        return self._basis_pairs(
-            self.first.r,
-            self.first.l,
-            self.second.r,
-            self.second.l,
-            basis='Y',
-        )
+    def as_row(self) -> list[typing.Union[int, float]]:
+        return [
+            self.c_00,
+            self.c_01,
+            self.c_10,
+            self.c_11,
+            self.odd,
+            self.even,
+            self.total,
+            self.even_probability,
+            self.qber,
+            self.visibility,
+        ]
 
 
 @dataclasses.dataclass(frozen=True)
@@ -318,121 +359,81 @@ class ProcessedTimetagData:
 
 
 @dataclasses.dataclass(frozen=True)
-class BasisMetrics:
-    """
-    Metrics calculated from four two-outcome coincidence counts.
+class BBM92ChannelMap:
+    first: PolarisationChannelMap
+    second: PolarisationChannelMap
 
-    The coincidence counts correspond to the possible outcomes 00, 01,
-    10, and 11 for a pair of two-outcome measurements.
+    @staticmethod
+    def _basis_pairs(
+        first_0: typing.Optional[int],
+        first_1: typing.Optional[int],
+        second_0: typing.Optional[int],
+        second_1: typing.Optional[int],
+        basis: str
+    ) -> BasisPairs:
+        channels = (
+            first_0,
+            first_1,
+            second_0,
+            second_1,
+        )
 
-    Parameters
-    ----------
-    c_00 : int
-        Coincidences between outcome 0 and outcome 0.
-    c_01 : int
-        Coincidences between outcome 0 and outcome 1.
-    c_10 : int
-        Coincidences between outcome 1 and outcome 0.
-    c_11 : int
-        Coincidences between outcome 1 and outcome 1.
-    """
+        if any(channel is None for channel in channels):
+            raise ValueError(
+                f'Both measurement stages must define the {basis} basis.'
+            )
 
-    c_00: int
-    c_01: int
-    c_10: int
-    c_11: int
+        assert first_0 is not None
+        assert first_1 is not None
+        assert second_0 is not None
+        assert second_1 is not None
 
-    @classmethod
-    def from_coincidences(
-            cls,
-            coincidences: dict[tuple[int, int], int],
-            pairs: tuple[
-                ChannelPair,
-                ChannelPair,
-                ChannelPair,
-                ChannelPair,
-            ],
-    ) -> 'BasisMetrics':
+        return (
+            ChannelPair(first_0, second_0, '00'),
+            ChannelPair(first_0, second_1, '01'),
+            ChannelPair(first_1, second_0, '10'),
+            ChannelPair(first_1, second_1, '11'),
+        )
+
+    @property
+    def zz_pairs(self) -> BasisPairs:
         """
-        Create basis metrics from coincidence data.
-
-        The channel pairs must be supplied in the order 00, 01, 10, 11.
-
-        Parameters
-        ----------
-        coincidences : dict[tuple[int, int], int]
-            Coincidence counts indexed by channel pair.
-        pairs : BasisPairs
-            Channel pairs corresponding to the outcomes 00, 01, 10, and
-            11, respectively.
-
-        Returns
-        -------
-        BasisMetrics
+        Return the H/V coincidence pairs.
         """
-        pair_00, pair_01, pair_10, pair_11 = pairs
-
-        return cls(
-            c_00=coincidences[pair_00.as_tuple()],
-            c_01=coincidences[pair_01.as_tuple()],
-            c_10=coincidences[pair_10.as_tuple()],
-            c_11=coincidences[pair_11.as_tuple()],
+        return self._basis_pairs(
+            self.first.h,
+            self.first.v,
+            self.second.h,
+            self.second.v,
+            basis='Z',
         )
 
     @property
-    def odd(self) -> int:
-        return self.c_01 + self.c_10
-
-    @property
-    def even(self) -> int:
-        return self.c_00 + self.c_11
-
-    @property
-    def total(self) -> int:
-        return self.odd + self.even
-
-    @property
-    def even_probability(self) -> float:
-        if self.total == 0:
-            return float('nan')
-
-        return self.even / self.total
-
-    @property
-    def odd_probability(self) -> float:
-        if self.total == 0:
-            return float('nan')
-
-        return self.odd / self.total
-
-    @property
-    def qber(self) -> float:
-        return qtoolkit.qber_from_coincidences(
-            c_00=self.c_00,
-            c_01=self.c_01,
-            c_10=self.c_10,
-            c_11=self.c_11,
+    def xx_pairs(self) -> BasisPairs:
+        """
+        Return the D/A coincidence pairs.
+        """
+        return self._basis_pairs(
+            self.first.d,
+            self.first.a,
+            self.second.d,
+            self.second.a,
+            basis='X',
         )
 
     @property
-    def visibility(self) -> float:
-        return qtoolkit.visibility_from_qber(
-            qber=self.qber,
+    def yy_pairs(self) -> BasisPairs:
+        """
+        Return the R/L coincidence pairs.
+        """
+        return self._basis_pairs(
+            self.first.r,
+            self.first.l,
+            self.second.r,
+            self.second.l,
+            basis='Y',
         )
 
-    def as_row(self) -> list[typing.Union[int, float]]:
-        return [
-            self.c_00,
-            self.c_01,
-            self.c_10,
-            self.c_11,
-            self.odd,
-            self.even,
-            self.total,
-            self.even_probability,
-            self.qber,
-            self.visibility,
-        ]
 
 @dataclasses.dataclass(frozen=True)
 class BBM92Metrics:

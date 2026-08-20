@@ -11,6 +11,18 @@ from .timetagging import (
     get_coincidences
 )
 
+from .lab import (
+    ChannelPair,
+    BasisPairs,
+    ChannelMap,
+    PolarisationChannelMap,
+    BasisMetrics,
+    TimetagData,
+    ProcessedTimetagData,
+    BBM92ChannelMap,
+    BBM92Metrics
+)
+
 from .quantum_functions import (
     qber,
     qber_from_coincidences,
@@ -32,6 +44,17 @@ __all__ = [
     'get_twofold_coincidences',
     'get_threefold_coincidences',
     'get_fourfold_coincidences',
+    'get_coincidences',
+
+    'ChannelPair',
+    'BasisPairs',
+    'ChannelMap',
+    'PolarisationChannelMap',
+    'BasisMetrics',
+    'TimetagData',
+    'ProcessedTimetagData',
+    'BBM92ChannelMap',
+    'BBM92Metrics',
 
     'qber',
     'qber_from_coincidences',
