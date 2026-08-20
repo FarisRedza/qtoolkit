@@ -8,7 +8,7 @@ def _get_twofold_coincidences(
         tags_a: np.typing.NDArray[np.int64],
         tags_b: np.typing.NDArray[np.int64],
         coincidence_window: int
-) -> float:
+) -> int:
     idx_a = 0
     idx_b = 0
     counts = 0
@@ -39,7 +39,7 @@ def _get_threefold_coincidences(
         tags_b: np.typing.NDArray[np.int64],
         tags_c: np.typing.NDArray[np.int64],
         coincidence_window: int
-) -> float:
+) -> int:
     idx_a = 0
     idx_b = 0
     idx_c = 0
@@ -81,7 +81,7 @@ def _get_fourfold_coincidences(
         tags_c: np.typing.NDArray[np.int64],
         tags_d: np.typing.NDArray[np.int64],
         coincidence_window: int
-) -> float:
+) -> int:
     idx_a = 0
     idx_b = 0
     idx_c = 0
@@ -127,7 +127,7 @@ def get_twofold_coincidences(
         tags_a: typing.Union[list[int], np.typing.NDArray[np.int64]],
         tags_b: typing.Union[list[int], np.typing.NDArray[np.int64]],
         coincidence_window: int
-) -> float:
+) -> int:
     tags_a = np.array(tags_a, dtype=np.int64)
     tags_b = np.array(tags_b, dtype=np.int64)
 
@@ -142,7 +142,7 @@ def get_threefold_coincidences(
         tags_b: typing.Union[list[int], np.typing.NDArray[np.int64]],
         tags_c: typing.Union[list[int], np.typing.NDArray[np.int64]],
         coincidence_window: int
-) -> float:
+) -> int:
     tags_a = np.array(tags_a, dtype=np.int64)
     tags_b = np.array(tags_b, dtype=np.int64)
     tags_c = np.array(tags_c, dtype=np.int64)
@@ -160,7 +160,7 @@ def get_fourfold_coincidences(
         tags_c: typing.Union[list[int], np.typing.NDArray[np.int64]],
         tags_d: typing.Union[list[int], np.typing.NDArray[np.int64]],
         coincidence_window: int
-) -> float:
+) -> int:
     tags_a = np.array(tags_a, dtype=np.int64)
     tags_b = np.array(tags_b, dtype=np.int64)
     tags_c = np.array(tags_c, dtype=np.int64)
