@@ -237,7 +237,7 @@ def get_fourfold_coincidences(
 def get_coincidences(
     timetags: np.typing.ArrayLike,
     channels: np.typing.ArrayLike,
-    pairs: list[tuple[int, int]],
+    pairs: typing.Iterable[tuple[int, int]],
     coincidence_window: int,
 ) -> dict[tuple[int, int], int]:
     """
