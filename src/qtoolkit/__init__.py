@@ -15,7 +15,12 @@ from .quantum_functions import (
     qber_from_coincidences,
     qz,
     qx,
-    qy
+    qy,
+    qber_from_visibility,
+    visibility,
+    visibility_from_qber,
+    fidelity_from_qber,
+    fidelity_from_visibility
 )
 
 __all__ = [
@@ -31,5 +36,10 @@ __all__ = [
     'qber_from_coincidences',
     'qz',
     'qx',
-    'qy'
+    'qy',
+    'qber_from_visibility',
+    'visibility',
+    'visibility_from_qber',
+    'fidelity_from_qber',
+    'fidelity_from_visibility'
 ]
