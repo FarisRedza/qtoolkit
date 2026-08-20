@@ -7,7 +7,8 @@ from .misc_functions import (
 from .timetagging import (
     get_twofold_coincidences,
     get_threefold_coincidences,
-    get_fourfold_coincidences
+    get_fourfold_coincidences,
+    get_coincidences
 )
 
 from .quantum_functions import (

@@ -233,3 +233,70 @@ def get_fourfold_coincidences(
         tags_d=tags_d,
         coincidence_window=coincidence_window
     )
+
+def get_coincidences(
+    timetags: np.typing.ArrayLike,
+    channels: np.typing.ArrayLike,
+    pairs: list[tuple[int, int]],
+    coincidence_window: int,
+) -> dict[tuple[int, int], int]:
+    """
+    Calculate twofold coincidences for selected channel pairs.
+
+    Parameters
+    ----------
+    timetags: np.typing.ArrayLike
+        Chronologically ordered timetags.
+
+    channels: np.typing.ArrayLike
+        Channel corresponding to each timetag.
+
+    pairs: list[tuple[int, int]]
+        Channel pairs for which coincidences should be calculated.
+
+    coincidence_window: int
+        Maximum separation between coincident timetags (ps).
+
+    Returns
+    -------
+    dict
+        Mapping ``(channel_a, channel_b)`` to coincidence count.
+    """
+
+    timetags = np.asarray(timetags, dtype=np.int64)
+    channels = np.asarray(channels, dtype=np.int64)
+
+    if timetags.ndim != 1:
+        raise ValueError('Timetags must be a 1D array.')
+
+    if channels.ndim != 1:
+        raise ValueError('Channels must be a 1D array.')
+
+    if len(timetags) != len(channels):
+        raise ValueError(
+            'Timetags and channels must have the same length.'
+        )
+
+    required_channels = {
+        channel
+        for pair in pairs
+        for channel in pair
+    }
+
+    channel_tags = {
+        channel: timetags[channels == channel]
+        for channel in required_channels
+    }
+
+    coincidences = {}
+
+    for channel_a, channel_b in pairs:
+        coincidences[channel_a, channel_b] = (
+            _get_twofold_coincidences(
+                tags_a=channel_tags[channel_a],
+                tags_b=channel_tags[channel_b],
+                coincidence_window=coincidence_window,
+            )
+        )
+
+    return coincidences
