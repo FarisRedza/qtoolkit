@@ -5,7 +5,8 @@ def binary_entropy(p: float) -> float:
     Calculate the binary entropy, which quantifies the uncertainty associated
     with a binary outcome with probability (p).
 
-    :math:`H(X) = -p\log_2(p) - (1-p)\log_2(1-p)`
+    .. math::
+        \\text{H}(X) = -p\\log_2(p) - (1-p)\\log_2(1-p)
 
     Parameters
     ----------
