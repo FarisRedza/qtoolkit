@@ -17,6 +17,12 @@ def binary_entropy(p: float) -> float:
     -------
     float
     """
+    if not 0 <= p <= 1:
+        raise ValueError('p must be between 0 and 1.')
+
+    if p in (0, 1):
+        return 0.0
+
     return -p * np.log2(p) - (1-p) * np.log2(1-p)
 
 def fraction_to_dB(x: float) -> float:
