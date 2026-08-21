@@ -326,17 +326,17 @@ def fidelity_from_qber(
 # denisty matrix functions
 
 def purity(
-        density_matrix: typing.Sequence[typing.Sequence[complex]]
+        density_matrix: np.typing.ArrayLike
 ) -> float:
     """
     Calculate quantum-state purity:
 
     .. math::
-        \\text{P} = \\text{Tr}(ρ^2)
+        \\text{P} = \\text{Tr}(\\rho^2)
     """
     rho = np.asarray(density_matrix, dtype=complex)
 
     if rho.ndim != 2 or rho.shape[0] != rho.shape[1]:
-        raise ValueError("Density matrix must be square.")
+        raise ValueError('Density matrix must be square.')
 
     return float(np.real(np.trace(rho @ rho)))
