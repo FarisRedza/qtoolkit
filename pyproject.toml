@@ -22,11 +22,12 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
     'pytest>=5.1.0',
+    'pytest-cov>=7.0.0',
     'vermin>=0.2.2'
 ]
 doc = [
-    'sphinx',
-    'piccolo-theme'
+    'sphinx>=7.0.0',
+    'piccolo-theme>=0.24.0'
 ]
 
 [project.urls]
