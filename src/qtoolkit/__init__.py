@@ -33,7 +33,9 @@ from .quantum_functions import (
     visibility,
     visibility_from_qber,
     fidelity_from_qber,
-    fidelity_from_visibility
+    fidelity_from_visibility,
+    symmetric_heralding_efficiency,
+    purity
 )
 
 __all__ = [
