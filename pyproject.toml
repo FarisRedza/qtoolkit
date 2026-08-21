@@ -24,7 +24,10 @@ dev = [
     'pytest>=5.1.0',
     'vermin>=0.2.2'
 ]
-doc = ['sphinx']
+doc = [
+    'sphinx',
+    'piccolo-theme'
+]
 
 [project.urls]
 Homepage = 'https://github.com/FarisRedza/qtoolkit'
