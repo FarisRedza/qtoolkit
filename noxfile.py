@@ -1,4 +1,4 @@
-import nox
+import nox # type: ignore
 
 
 PYTHON_VERSIONS = [
