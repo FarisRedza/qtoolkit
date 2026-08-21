@@ -233,6 +233,12 @@ class TimetagData:
             dtype=np.int64,
             ndmin=2
         )
+
+        if data.shape[1] != 2:
+            raise ValueError(
+                'Timetag file must contain exactly two columns.'
+            )
+
         timetags = data[:,0]
         channels = data[:,1].astype(np.int8)
 
@@ -243,7 +249,7 @@ class TimetagData:
         )
 
     @property
-    def duration(self) -> int:
+    def duration_ps(self) -> int:
         if len(self) < 2:
             return 0
 
@@ -293,6 +299,17 @@ class TimetagData:
     def __len__(self) -> int:
         return len(self.timetags)
 
+    def __post_init__(self) -> None:
+        if self.timetags.ndim != 1:
+            raise ValueError('timetags must be one-dimensional.')
+
+        if self.channels.ndim != 1:
+            raise ValueError('channels must be one-dimensional.')
+
+        if len(self.timetags) != len(self.channels):
+            raise ValueError(
+                'timetags and channels must have the same length.'
+            )
 
 @dataclasses.dataclass(frozen=True)
 class ProcessedTimetagData:
@@ -444,6 +461,17 @@ class BBM92ChannelMap:
 class BBM92Metrics:
     zz: BasisMetrics
     xx: BasisMetrics
+
+    @classmethod
+    def from_processed_data(
+            cls,
+            processed: ProcessedTimetagData,
+            channel_map: BBM92ChannelMap,
+    ) -> 'BBM92Metrics':
+        return cls(
+            zz=processed.get_basis_metrics(channel_map.zz_pairs),
+            xx=processed.get_basis_metrics(channel_map.xx_pairs),
+        )
 
     @property
     def fidelity(self) -> float:
