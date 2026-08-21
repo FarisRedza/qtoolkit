@@ -33,3 +33,13 @@ doc = [
 [project.urls]
 Homepage = 'https://github.com/FarisRedza/qtoolkit'
 Repository = 'https://github.com/FarisRedza/qtoolkit.git'
+
+[tool.pytest.ini_options]
+addopts = [
+    '--cov=qtoolkit',
+    '--cov-report=term-missing',
+    '--cov-branch'
+]
+testpaths = [
+    'tests',
+]

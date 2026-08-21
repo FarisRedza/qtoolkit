@@ -7,8 +7,8 @@ make -C docs clean && make -C docs dirhtml
 
 # Testing
 ```bash
-nox
+pytest
 ```
 ```bash
-pytest --cov=.
+nox
 ```
