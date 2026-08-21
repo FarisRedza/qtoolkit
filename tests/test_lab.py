@@ -1,5 +1,55 @@
 import qtoolkit
+import numpy as np
 import pytest
+
+
+def test_timetag_data_from_file(tmp_path) -> None:
+    file_path = tmp_path.joinpath('timetags.txt')
+
+    file_path.write_text(
+        '941575226770542 6\n'
+        '941575227172420 0\n'
+        '941575227234390 6\n'
+        '941575227678840 6\n'
+        '941575228068663 3\n'
+        '941575228250870 4\n'
+        '941575230136717 6\n'
+        '941575230665605 2\n'
+        '941575230717349 7\n'
+        '941575230717507 1'
+    )
+
+    timetag_data = qtoolkit.TimetagData.from_file(
+        file_path=file_path
+    )
+
+    np.testing.assert_array_equal(
+        timetag_data.timetags,
+        np.array([
+            941575226770542,
+            941575227172420,
+            941575227234390,
+            941575227678840,
+            941575228068663,
+            941575228250870,
+            941575230136717,
+            941575230665605,
+            941575230717349,
+            941575230717507
+            ],
+            dtype=np.int64
+        ),
+    )
+
+    np.testing.assert_array_equal(
+        timetag_data.channels,
+        np.array(
+            [6, 0, 6, 6, 3, 4, 6, 2, 7, 1],
+            dtype=np.int8
+        ),
+    )
+
+    assert timetag_data.file_path == file_path
 
 def test_metrics() -> None:
     rel = 1e-3
