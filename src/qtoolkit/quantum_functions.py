@@ -199,7 +199,7 @@ def qber_from_visibility(visibility: float) -> float:
     Calculate QBER from visibility
 
     .. math:: 
-        QBER = (1 - V)/2
+        \\text{QBER} = (1 - V)/2
 
     Parameters
     ----------
@@ -316,7 +316,7 @@ def fidelity_from_qber(
     Two-basis Bell-state fidelity estimate.
 
     .. math::
-        V = 1 - 2 \\text{QBER}
+        V = 1 - 2 * \\text{QBER}
 
         F ~= (V_x + V_z) / 2 \\\\
            = 1 - Q_x - Q_z
