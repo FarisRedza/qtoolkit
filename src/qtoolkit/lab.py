@@ -4,10 +4,15 @@ import pathlib
 
 import numpy as np
 
-import qtoolkit
+from .timetagging import get_coincidences
+from .quantum_functions import (
+    qber_from_coincidences,
+    visibility_from_qber,
+    fidelity_from_visibility
+)
 
 
-@dataclasses.dataclass(frozen=True, slots=True)
+@dataclasses.dataclass(frozen=True)
 class ChannelPair:
     """
     Pair of timetagger channels.
@@ -183,7 +188,7 @@ class BasisMetrics:
 
     @property
     def qber(self) -> float:
-        return qtoolkit.qber_from_coincidences(
+        return qber_from_coincidences(
             c_00=self.c_00,
             c_01=self.c_01,
             c_10=self.c_10,
@@ -192,7 +197,7 @@ class BasisMetrics:
 
     @property
     def visibility(self) -> float:
-        return qtoolkit.visibility_from_qber(
+        return visibility_from_qber(
             qber=self.qber,
         )
 
@@ -291,7 +296,7 @@ class TimetagData:
 
 @dataclasses.dataclass(frozen=True)
 class ProcessedTimetagData:
-    coincidences: dict[ChannelPair, int]
+    coincidences: dict[tuple[int, int], int]
     coincidence_window: int
     file_path: typing.Optional[pathlib.Path] = None
 
@@ -310,7 +315,7 @@ class ProcessedTimetagData:
             else pair
             for pair in pairs
         )
-        coincidences = qtoolkit.get_coincidences(
+        coincidences = get_coincidences(
             timetags=timetag_data.timetags,
             channels=timetag_data.channels,
             pairs=pairs,
@@ -442,7 +447,7 @@ class BBM92Metrics:
 
     @property
     def fidelity(self) -> float:
-        return qtoolkit.fidelity_from_visibility(
+        return fidelity_from_visibility(
             visibility_z=self.zz.visibility,
             visibility_x=self.xx.visibility
         )
