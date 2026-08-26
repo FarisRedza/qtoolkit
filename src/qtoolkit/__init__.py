@@ -11,6 +11,10 @@ from .timetagging import (
     get_coincidences
 )
 
+from .simulate_timetags import (
+    generate_timetags
+)
+
 from .lab import (
     ChannelPair,
     BasisPairs,
@@ -48,6 +52,8 @@ __all__ = [
     'get_fourfold_coincidences',
     'get_coincidences',
 
+    'generate_timetags',
+
     'ChannelPair',
     'BasisPairs',
     'ChannelMap',
@@ -67,5 +73,7 @@ __all__ = [
     'visibility',
     'visibility_from_qber',
     'fidelity_from_qber',
-    'fidelity_from_visibility'
+    'fidelity_from_visibility',
+    'symmetric_heralding_efficiency',
+    'purity',
 ]
