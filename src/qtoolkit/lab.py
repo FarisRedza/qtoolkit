@@ -228,11 +228,22 @@ class TimetagData:
             file_path: typing.Union[pathlib.Path, str]
     ) -> 'TimetagData':
         file_path = pathlib.Path(file_path)
-        data = np.loadtxt(
-            fname=file_path,
-            dtype=np.int64,
-            ndmin=2
-        )
+        file_type = file_path.suffix
+        if file_type == '.txt' or file_type == '.text':
+                data = np.loadtxt(
+                    fname=file_path,
+                    dtype=np.int64,
+                    ndmin=2
+                )
+        elif file_type == '.csv':
+            data = np.loadtxt(
+                fname=file_path,
+                dtype=np.int64,
+                delimiter=',',
+                ndmin=2
+            )
+        else:
+            raise ValueError(f'Unsupported file type: {file_type}')
 
         if data.shape[1] != 2:
             raise ValueError(
