@@ -266,6 +266,18 @@ class TimetagData:
 
         return int(self.timetags[-1] - self.timetags[0])
 
+    def to_file(
+            self,
+            file_path: typing.Union[pathlib.Path, str]
+    ) -> None:
+        file_path = pathlib.Path(file_path)
+
+        np.savetxt(
+            fname='test.txt',
+            X=np.c_[(self.timetags, self.channels)],
+            fmt='%d'
+        )
+
     def get_channel_timetags(
             self,
             channel: int
