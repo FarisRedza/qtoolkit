@@ -12,3 +12,7 @@ pytest
 ```bash
 nox
 ```
+```bash
+act push -W .github/workflows/test_main.yaml
+act -e .act/tag-push.json
+```
