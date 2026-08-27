@@ -42,7 +42,9 @@ doc = [
 
 [project.urls]
 Homepage = 'https://github.com/FarisRedza/qtoolkit'
+Documentation = 'https://qtoolkit.readthedocs.io/en/latest/'
 Repository = 'https://github.com/FarisRedza/qtoolkit.git'
+Issues = 'https://github.com/FarisRedza/qtoolkit/issues'
 
 [tool.pytest.ini_options]
 addopts = [
