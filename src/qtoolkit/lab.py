@@ -228,8 +228,8 @@ class TimetagData:
             file_path: typing.Union[pathlib.Path, str]
     ) -> 'TimetagData':
         file_path = pathlib.Path(file_path)
-        file_type = file_path.suffix
-        if file_type == '.txt' or file_type == '.text':
+        file_type = file_path.suffix.lower()
+        if file_type in {'.txt', '.text'}:
                 data = np.loadtxt(
                     fname=file_path,
                     dtype=np.int64,
