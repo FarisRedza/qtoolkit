@@ -12,6 +12,7 @@ from .timetagging import (
 )
 
 from .simulate_timetags import (
+    CoincidencePair,
     generate_timetags
 )
 
@@ -52,6 +53,7 @@ __all__ = [
     'get_fourfold_coincidences',
     'get_coincidences',
 
+    'CoincidencePair',
     'generate_timetags',
 
     'ChannelPair',
