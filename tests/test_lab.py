@@ -318,7 +318,7 @@ def test_timetag_data_rejects_different_lengths() -> None:
         )
 
 
-def test_timetag_data_from_file(
+def test_timetag_data_from_text_file(
         tmp_path: pathlib.Path,
 ) -> None:
     file_path = tmp_path.joinpath('timetags.txt')
@@ -356,6 +356,61 @@ def test_timetag_data_from_file(
     )
 
     assert result.file_path == file_path
+
+
+def test_timetag_data_from_csv_file(
+        tmp_path: pathlib.Path,
+) -> None:
+    file_path = tmp_path.joinpath('timetags.csv')
+
+    file_path.write_text(
+        '941575226770542,6\n'
+        '941575227172420,0\n'
+        '941575227234390,6\n'
+        '941575227678840,6\n'
+    )
+
+    result = qtoolkit.TimetagData.from_file(
+        file_path
+    )
+
+    np.testing.assert_array_equal(
+        result.timetags,
+        np.array(
+            [
+                941575226770542,
+                941575227172420,
+                941575227234390,
+                941575227678840,
+            ],
+            dtype=np.int64,
+        ),
+    )
+
+    np.testing.assert_array_equal(
+        result.channels,
+        np.array(
+            [6, 0, 6, 6],
+            dtype=np.int8,
+        ),
+    )
+
+    assert result.file_path == file_path
+
+
+def test_timetag_data_from_invalid_file(
+        tmp_path: pathlib.Path,
+) -> None:
+    with pytest.raises(
+        ValueError,
+        match='Unsupported file type: ',
+    ):
+
+        file_path = tmp_path.joinpath('timetags')
+
+        result = qtoolkit.TimetagData.from_file(
+            file_path
+        )
 
 
 def test_timetag_data_from_string_path(
