@@ -273,7 +273,7 @@ class TimetagData:
         file_path = pathlib.Path(file_path)
 
         np.savetxt(
-            fname='test.txt',
+            fname=file_path,
             X=np.c_[(self.timetags, self.channels)],
             fmt='%d'
         )
