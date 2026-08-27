@@ -3,8 +3,19 @@
 	"image": "mcr.microsoft.com/devcontainers/python:3-3.14-trixie",
 	"features": {
 		"ghcr.io/devcontainers-extra/features/nox:2": {},
-		"ghcr.io/devcontainers-extra/features/uv:1": {}
+		"ghcr.io/devcontainers-extra/features/uv:1": {},
+		"ghcr.io/devcontainers-extra/features/act:1": {}
 	},
+    "mounts": [
+        "source=${localEnv:XDG_RUNTIME_DIR}/podman/podman.sock,target=/run/user/1000/podman/podman.sock,type=bind"
+    ],
+
+    "containerEnv": {
+        "DOCKER_HOST": "unix:///run/user/1000/podman/podman.sock"
+    },
+	"runArgs": [
+		"--publish=34567:34567"
+	],
 	"customizations": {
 		"vscode": {
 			"extensions": [

@@ -221,3 +221,6 @@ __marimo__/
 
 # Dev containers
 devcontainer-lock.json
+
+# CI
+.act-artifacts/

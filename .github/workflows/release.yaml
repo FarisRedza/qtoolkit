@@ -1,0 +1,206 @@
+name: Release version
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build:
+    name: Build distribution
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.x"
+
+      - name: Install build tools
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install build twine
+
+      - name: Build wheel and source distribution
+        run: |
+          python -m build
+
+      - name: Check distributions
+        run: |
+          python -m twine check dist/*
+
+      - name: Show distributions
+        run: |
+          ls -lh dist/
+
+      - name: Upload distributions
+        uses: actions/upload-artifact@v5
+        with:
+          name: python-package-distributions
+          path: dist/
+
+  test-sdist:
+    name: Test source distribution on Python ${{ matrix.python-version }}
+
+    needs:
+      - build
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+
+      matrix:
+        python-version:
+          - "3.9"
+          - "3.10"
+          - "3.11"
+          - "3.12"
+          - "3.13"
+          - "3.14"
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Download distributions
+        uses: actions/download-artifact@v5
+        with:
+          name: python-package-distributions
+          path: dist/
+
+      - name: Install source distribution
+        run: |
+          python -m pip install dist/*.tar.gz
+
+      - name: Verify source distribution
+        run: |
+          cd /tmp
+          python - <<'PY'
+          import qtoolkit
+
+          print(f'qtoolkit imported from: {qtoolkit.__file__}')
+          PY
+
+  test-wheel:
+    name: Test wheel on Python ${{ matrix.python-version }}
+
+    needs:
+      - build
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+
+      matrix:
+        python-version:
+          - "3.9"
+          - "3.10"
+          - "3.11"
+          - "3.12"
+          - "3.13"
+          - "3.14"
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Download distributions
+        uses: actions/download-artifact@v5
+        with:
+          name: python-package-distributions
+          path: dist/
+
+      - name: Install test dependencies
+        run: |
+          python -m pip install pytest
+
+      - name: Install built wheel
+        run: |
+          python -m pip install dist/*.whl
+
+      - name: Verify wheel installation
+        run: |
+          cd /tmp
+          python - <<'PY'
+          import pathlib
+          import qtoolkit
+
+          path = pathlib.Path(qtoolkit.__file__).resolve()
+
+          print(f'qtoolkit imported from: {path}')
+
+          assert 'site-packages' in path.parts
+          PY
+
+      - name: Copy tests outside source tree
+        run: |
+          cp -r tests /tmp/qtoolkit-tests
+
+      - name: Test installed wheel
+        run: |
+          cd /tmp
+          python -m pytest qtoolkit-tests
+
+  release:
+    name: Create GitHub release
+
+    needs:
+      - build
+      - test-sdist
+      - test-wheel
+
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download distributions
+        uses: actions/download-artifact@v5
+        with:
+          name: python-package-distributions
+          path: dist/
+
+      - name: Show release assets
+        run: |
+          ls -lh dist/
+
+      - name: Simulate GitHub release
+        if: ${{ env.ACT }}
+        run: |
+          echo "Would create release: ${GITHUB_REF_NAME}"
+          echo "Would upload:"
+          ls -1 dist/
+
+      - name: Create GitHub release
+        if: ${{ !env.ACT }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${GITHUB_REF_NAME}" \
+            dist/* \
+            --verify-tag \
+            --generate-notes \
+            --title "${GITHUB_REF_NAME}"

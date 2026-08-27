@@ -1,0 +1,2 @@
+--artifact-server-path=.act-artifacts
+--artifact-server-port=34567
