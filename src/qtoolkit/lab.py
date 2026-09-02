@@ -4,7 +4,7 @@ import pathlib
 
 import numpy as np
 
-from .timetagging import get_coincidences
+from .timetagging import count_coincidences
 from .quantum_functions import (
     qber_from_coincidences,
     visibility_from_qber,
@@ -355,7 +355,7 @@ class ProcessedTimetagData:
             else pair
             for pair in pairs
         )
-        coincidences = get_coincidences(
+        coincidences = count_coincidences(
             timetags=timetag_data.timetags,
             channels=timetag_data.channels,
             pairs=pairs,

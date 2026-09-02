@@ -5,10 +5,10 @@ from .misc_functions import (
 )
 
 from .timetagging import (
-    get_twofold_coincidences,
-    get_threefold_coincidences,
-    get_fourfold_coincidences,
-    get_coincidences
+    count_twofold_coincidences,
+    count_threefold_coincidences,
+    count_fourfold_coincidences,
+    count_coincidences
 )
 
 from .simulate_timetags import (
@@ -48,10 +48,10 @@ __all__ = [
     'fraction_to_dB',
     'dB_to_fraction',
 
-    'get_twofold_coincidences',
-    'get_threefold_coincidences',
-    'get_fourfold_coincidences',
-    'get_coincidences',
+    'count_twofold_coincidences',
+    'count_threefold_coincidences',
+    'count_fourfold_coincidences',
+    'count_coincidences',
 
     'CoincidencePair',
     'generate_timetags',

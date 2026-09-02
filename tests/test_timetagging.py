@@ -3,10 +3,10 @@ import pytest
 
 import qtoolkit
 
-# get_twofold_coincidences
+# count_twofold_coincidences
 
 def test_twofold_exact_match() -> None:
-    result = qtoolkit.get_twofold_coincidences(
+    result = qtoolkit.count_twofold_coincidences(
         tags_a=[1000],
         tags_b=[1000],
         coincidence_window=250,
@@ -16,7 +16,7 @@ def test_twofold_exact_match() -> None:
 
 
 def test_twofold_at_window_boundary() -> None:
-    result = qtoolkit.get_twofold_coincidences(
+    result = qtoolkit.count_twofold_coincidences(
         tags_a=[1000],
         tags_b=[1250],
         coincidence_window=250,
@@ -26,7 +26,7 @@ def test_twofold_at_window_boundary() -> None:
 
 
 def test_twofold_outside_window() -> None:
-    result = qtoolkit.get_twofold_coincidences(
+    result = qtoolkit.count_twofold_coincidences(
         tags_a=[1000],
         tags_b=[1251],
         coincidence_window=250,
@@ -47,7 +47,7 @@ def test_twofold_empty_input(
         tags_a,
         tags_b,
 ) -> None:
-    result = qtoolkit.get_twofold_coincidences(
+    result = qtoolkit.count_twofold_coincidences(
         tags_a=tags_a,
         tags_b=tags_b,
         coincidence_window=250,
@@ -57,7 +57,7 @@ def test_twofold_empty_input(
 
 
 def test_twofold_multiple_coincidences() -> None:
-    result = qtoolkit.get_twofold_coincidences(
+    result = qtoolkit.count_twofold_coincidences(
         tags_a=[
             1000,
             2000,
@@ -75,7 +75,7 @@ def test_twofold_multiple_coincidences() -> None:
 
 
 def test_twofold_advances_first_channel() -> None:
-    result = qtoolkit.get_twofold_coincidences(
+    result = qtoolkit.count_twofold_coincidences(
         tags_a=[0, 1000],
         tags_b=[1000],
         coincidence_window=100,
@@ -85,7 +85,7 @@ def test_twofold_advances_first_channel() -> None:
 
 
 def test_twofold_advances_second_channel() -> None:
-    result = qtoolkit.get_twofold_coincidences(
+    result = qtoolkit.count_twofold_coincidences(
         tags_a=[1000],
         tags_b=[0, 1000],
         coincidence_window=100,
@@ -95,7 +95,7 @@ def test_twofold_advances_second_channel() -> None:
 
 
 def test_twofold_event_used_only_once() -> None:
-    result = qtoolkit.get_twofold_coincidences(
+    result = qtoolkit.count_twofold_coincidences(
         tags_a=[1000],
         tags_b=[950, 1050],
         coincidence_window=100,
@@ -114,7 +114,7 @@ def test_twofold_accepts_numpy_arrays() -> None:
         dtype=np.int64,
     )
 
-    result = qtoolkit.get_twofold_coincidences(
+    result = qtoolkit.count_twofold_coincidences(
         tags_a=tags_a,
         tags_b=tags_b,
         coincidence_window=100,
@@ -122,10 +122,10 @@ def test_twofold_accepts_numpy_arrays() -> None:
 
     assert result == 2
 
-# get_threefold_coincidences
+# count_threefold_coincidences
 
 def test_threefold_exact_match() -> None:
-    result = qtoolkit.get_threefold_coincidences(
+    result = qtoolkit.count_threefold_coincidences(
         tags_a=[1000],
         tags_b=[1000],
         tags_c=[1000],
@@ -136,7 +136,7 @@ def test_threefold_exact_match() -> None:
 
 
 def test_threefold_at_window_boundary() -> None:
-    result = qtoolkit.get_threefold_coincidences(
+    result = qtoolkit.count_threefold_coincidences(
         tags_a=[1000],
         tags_b=[1100],
         tags_c=[1250],
@@ -147,7 +147,7 @@ def test_threefold_at_window_boundary() -> None:
 
 
 def test_threefold_outside_window() -> None:
-    result = qtoolkit.get_threefold_coincidences(
+    result = qtoolkit.count_threefold_coincidences(
         tags_a=[1000],
         tags_b=[1100],
         tags_c=[1251],
@@ -158,7 +158,7 @@ def test_threefold_outside_window() -> None:
 
 
 def test_threefold_multiple_coincidences() -> None:
-    result = qtoolkit.get_threefold_coincidences(
+    result = qtoolkit.count_threefold_coincidences(
         tags_a=[1000, 2000],
         tags_b=[1050, 2050],
         tags_c=[1100, 2100],
@@ -183,17 +183,17 @@ def test_threefold_skips_early_event(
 
     timetags[early_index] = [0, 1000]
 
-    result = qtoolkit.get_threefold_coincidences(
+    result = qtoolkit.count_threefold_coincidences(
         *timetags,
         coincidence_window=100,
     )
 
     assert result == 1
 
-# get_fourfold_coincidences
+# count_fourfold_coincidences
 
 def test_fourfold_exact_match() -> None:
-    result = qtoolkit.get_fourfold_coincidences(
+    result = qtoolkit.count_fourfold_coincidences(
         tags_a=[1000],
         tags_b=[1000],
         tags_c=[1000],
@@ -205,7 +205,7 @@ def test_fourfold_exact_match() -> None:
 
 
 def test_fourfold_at_window_boundary() -> None:
-    result = qtoolkit.get_fourfold_coincidences(
+    result = qtoolkit.count_fourfold_coincidences(
         tags_a=[1000],
         tags_b=[1050],
         tags_c=[1100],
@@ -217,7 +217,7 @@ def test_fourfold_at_window_boundary() -> None:
 
 
 def test_fourfold_outside_window() -> None:
-    result = qtoolkit.get_fourfold_coincidences(
+    result = qtoolkit.count_fourfold_coincidences(
         tags_a=[1000],
         tags_b=[1050],
         tags_c=[1100],
@@ -229,7 +229,7 @@ def test_fourfold_outside_window() -> None:
 
 
 def test_fourfold_multiple_coincidences() -> None:
-    result = qtoolkit.get_fourfold_coincidences(
+    result = qtoolkit.count_fourfold_coincidences(
         tags_a=[1000, 2000],
         tags_b=[1050, 2050],
         tags_c=[1100, 2100],
@@ -256,16 +256,16 @@ def test_fourfold_skips_early_event(
 
     timetags[early_index] = [0, 1000]
 
-    result = qtoolkit.get_fourfold_coincidences(
+    result = qtoolkit.count_fourfold_coincidences(
         *timetags,
         coincidence_window=100,
     )
 
     assert result == 1
 
-# get_coincidences
+# count_coincidences
 
-def test_get_coincidences_multiple_pairs() -> None:
+def test_count_coincidences_multiple_pairs() -> None:
     timetags = np.array([
         1000,
         1050,
@@ -284,7 +284,7 @@ def test_get_coincidences_multiple_pairs() -> None:
         2,
     ])
 
-    result = qtoolkit.get_coincidences(
+    result = qtoolkit.count_coincidences(
         timetags=timetags,
         channels=channels,
         pairs=[
@@ -300,8 +300,8 @@ def test_get_coincidences_multiple_pairs() -> None:
     }
 
 
-def test_get_coincidences_missing_channel() -> None:
-    result = qtoolkit.get_coincidences(
+def test_count_coincidences_missing_channel() -> None:
+    result = qtoolkit.count_coincidences(
         timetags=[1000, 2000],
         channels=[0, 0],
         pairs=[(0, 7)],
@@ -313,8 +313,8 @@ def test_get_coincidences_missing_channel() -> None:
     }
 
 
-def test_get_coincidences_empty_pairs() -> None:
-    result = qtoolkit.get_coincidences(
+def test_count_coincidences_empty_pairs() -> None:
+    result = qtoolkit.count_coincidences(
         timetags=[1000, 2000],
         channels=[0, 1],
         pairs=[],
@@ -324,12 +324,12 @@ def test_get_coincidences_empty_pairs() -> None:
     assert result == {}
 
 
-def test_get_coincidences_rejects_non_1d_timetags() -> None:
+def test_count_coincidences_rejects_non_1d_timetags() -> None:
     with pytest.raises(
         ValueError,
         match='Timetags must be a 1D array',
     ):
-        qtoolkit.get_coincidences(
+        qtoolkit.count_coincidences(
             timetags=[[1000, 2000]],
             channels=[0, 1],
             pairs=[(0, 1)],
@@ -337,12 +337,12 @@ def test_get_coincidences_rejects_non_1d_timetags() -> None:
         )
 
 
-def test_get_coincidences_rejects_non_1d_channels() -> None:
+def test_count_coincidences_rejects_non_1d_channels() -> None:
     with pytest.raises(
         ValueError,
         match='Channels must be a 1D array',
     ):
-        qtoolkit.get_coincidences(
+        qtoolkit.count_coincidences(
             timetags=[1000, 2000],
             channels=[[0, 1]],
             pairs=[(0, 1)],
@@ -350,12 +350,12 @@ def test_get_coincidences_rejects_non_1d_channels() -> None:
         )
 
 
-def test_get_coincidences_rejects_different_lengths() -> None:
+def test_count_coincidences_rejects_different_lengths() -> None:
     with pytest.raises(
         ValueError,
         match='must have the same length',
     ):
-        qtoolkit.get_coincidences(
+        qtoolkit.count_coincidences(
             timetags=[1000, 2000],
             channels=[0],
             pairs=[(0, 1)],

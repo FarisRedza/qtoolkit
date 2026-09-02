@@ -4,7 +4,7 @@ import numpy as np
 import numba
 
 @numba.njit(cache=True)
-def _get_twofold_coincidences(
+def _count_twofold_coincidences(
         tags_a: np.typing.NDArray[np.int64],
         tags_b: np.typing.NDArray[np.int64],
         coincidence_window: int
@@ -34,7 +34,7 @@ def _get_twofold_coincidences(
     return counts
 
 @numba.njit(cache=True)
-def _get_threefold_coincidences(
+def _count_threefold_coincidences(
         tags_a: np.typing.NDArray[np.int64],
         tags_b: np.typing.NDArray[np.int64],
         tags_c: np.typing.NDArray[np.int64],
@@ -75,7 +75,7 @@ def _get_threefold_coincidences(
     return counts
 
 @numba.njit(cache=True)
-def _get_fourfold_coincidences(
+def _count_fourfold_coincidences(
         tags_a: np.typing.NDArray[np.int64],
         tags_b: np.typing.NDArray[np.int64],
         tags_c: np.typing.NDArray[np.int64],
@@ -123,13 +123,13 @@ def _get_fourfold_coincidences(
 
     return counts
 
-def get_twofold_coincidences(
+def count_twofold_coincidences(
         tags_a: typing.Union[list[int], np.typing.NDArray[np.int64]],
         tags_b: typing.Union[list[int], np.typing.NDArray[np.int64]],
         coincidence_window: int
 ) -> int:
     """
-    Get the number of entries in two arrays that are within the coincidence
+    Count the number of entries in two arrays that are within the coincidence
     window of each other.
 
     Parameters
@@ -149,20 +149,20 @@ def get_twofold_coincidences(
     tags_a = np.asarray(tags_a, dtype=np.int64)
     tags_b = np.asarray(tags_b, dtype=np.int64)
 
-    return _get_twofold_coincidences(
+    return _count_twofold_coincidences(
         tags_a=tags_a,
         tags_b=tags_b,
         coincidence_window=coincidence_window
     )
 
-def get_threefold_coincidences(
+def count_threefold_coincidences(
         tags_a: typing.Union[list[int], np.typing.NDArray[np.int64]],
         tags_b: typing.Union[list[int], np.typing.NDArray[np.int64]],
         tags_c: typing.Union[list[int], np.typing.NDArray[np.int64]],
         coincidence_window: int
 ) -> int:
     """
-    Get the number of entries in three arrays that are within the coincidence
+    Count the number of entries in three arrays that are within the coincidence
     window of each other.
 
     Parameters
@@ -185,14 +185,14 @@ def get_threefold_coincidences(
     tags_b = np.asarray(tags_b, dtype=np.int64)
     tags_c = np.asarray(tags_c, dtype=np.int64)
 
-    return _get_threefold_coincidences(
+    return _count_threefold_coincidences(
         tags_a=tags_a,
         tags_b=tags_b,
         tags_c=tags_c,
         coincidence_window=coincidence_window
     )
 
-def get_fourfold_coincidences(
+def count_fourfold_coincidences(
         tags_a: typing.Union[list[int], np.typing.NDArray[np.int64]],
         tags_b: typing.Union[list[int], np.typing.NDArray[np.int64]],
         tags_c: typing.Union[list[int], np.typing.NDArray[np.int64]],
@@ -200,7 +200,7 @@ def get_fourfold_coincidences(
         coincidence_window: int
 ) -> int:
     """
-    Get the number of entries in four arrays that are within the coincidence
+    Count the number of entries in four arrays that are within the coincidence
     window of each other.
 
     Parameters
@@ -226,7 +226,7 @@ def get_fourfold_coincidences(
     tags_c = np.asarray(tags_c, dtype=np.int64)
     tags_d = np.asarray(tags_d, dtype=np.int64)
 
-    return _get_fourfold_coincidences(
+    return _count_fourfold_coincidences(
         tags_a=tags_a,
         tags_b=tags_b,
         tags_c=tags_c,
@@ -234,14 +234,14 @@ def get_fourfold_coincidences(
         coincidence_window=coincidence_window
     )
 
-def get_coincidences(
+def count_coincidences(
     timetags: np.typing.ArrayLike,
     channels: np.typing.ArrayLike,
     pairs: typing.Iterable[tuple[int, int]],
     coincidence_window: int,
 ) -> dict[tuple[int, int], int]:
     """
-    Calculate twofold coincidences for selected channel pairs.
+    Counts twofold coincidences for selected channel pairs.
 
     Parameters
     ----------
@@ -292,7 +292,7 @@ def get_coincidences(
 
     for channel_a, channel_b in pairs:
         coincidences[channel_a, channel_b] = (
-            _get_twofold_coincidences(
+            _count_twofold_coincidences(
                 tags_a=channel_tags[channel_a],
                 tags_b=channel_tags[channel_b],
                 coincidence_window=coincidence_window,
