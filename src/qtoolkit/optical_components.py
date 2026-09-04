@@ -84,3 +84,15 @@ class HalfWavePlate(WavePlate):
             retardance_rad=np.pi,
             angle_deg=angle_deg,
         )
+
+
+def compose_waveplates(
+    waveplates: list[WavePlate],
+) -> np.ndarray:
+    """Compose a sequence of waveplates into a single Jones matrix."""
+    result = np.eye(2, dtype=complex)
+
+    for waveplate in waveplates:
+        result = waveplate.matrix @ result
+
+    return result

@@ -46,8 +46,10 @@ from .quantum_functions import (
 )
 
 from .optical_components import (
+    WavePlate,
     QuarterWavePlate,
     HalfWavePlate,
+    compose_waveplates
 )
 
 __all__ = [
@@ -88,6 +90,8 @@ __all__ = [
     'symmetric_heralding_efficiency',
     'purity',
 
+    'WavePlate',
     'QuarterWavePlate',
     'HalfWavePlate',
+    'compose_waveplates'
 ]
