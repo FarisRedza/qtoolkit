@@ -34,6 +34,60 @@ def _count_twofold_coincidences(
     return counts
 
 @numba.njit(cache=True)
+def _find_twofold_coincidence_indices(
+        tags_a: np.typing.NDArray[np.int64],
+        tags_b: np.typing.NDArray[np.int64],
+        coincidence_window: int
+) -> tuple[
+    np.typing.NDArray[np.int64],
+    np.typing.NDArray[np.int64]
+]:
+    idx_a = 0
+    idx_b = 0
+    counts = 0
+
+    # this method is faster but uses more memory
+    # on linux this is fine due to how virtual memory works,
+    # but unclear if this is the case on windows or macos
+    max_coincidences = min(len(tags_a), len(tags_b))
+    indices_a = np.empty(max_coincidences, dtype=np.int64)
+    indices_b = np.empty(max_coincidences, dtype=np.int64)
+
+    # this method is slower but potentially uses less memory
+    # assuming that virtual memory is a problem on windows
+    # coincidences = _count_twofold_coincidences(
+    #     tags_a=tags_a,
+    #     tags_b=tags_b,
+    #     coincidence_window=coincidence_window
+    # )
+    # indices_a = np.empty(coincidences, dtype=np.int64)
+    # indices_b = np.empty(coincidences, dtype=np.int64)
+
+    while idx_a < len(tags_a) and idx_b < len(tags_b):
+        time_a = tags_a[idx_a]
+        time_b = tags_b[idx_b]
+
+        minimum = min(time_a, time_b)
+        maximum = max(time_a, time_b)
+
+        if maximum - minimum <= coincidence_window:
+            indices_a[counts] = idx_a
+            indices_b[counts] = idx_b
+
+            counts += 1
+            idx_a += 1
+            idx_b += 1
+
+        elif time_a == minimum:
+            idx_a += 1
+
+        else:
+            idx_b += 1
+
+    # return indices_a, indices_b
+    return indices_a[:counts], indices_b[:counts]
+
+@numba.njit(cache=True)
 def _count_threefold_coincidences(
         tags_a: np.typing.NDArray[np.int64],
         tags_b: np.typing.NDArray[np.int64],
@@ -150,6 +204,23 @@ def count_twofold_coincidences(
     tags_b = np.asarray(tags_b, dtype=np.int64)
 
     return _count_twofold_coincidences(
+        tags_a=tags_a,
+        tags_b=tags_b,
+        coincidence_window=coincidence_window
+    )
+
+def find_twofold_coincidence_indices(
+        tags_a: np.typing.NDArray[np.int64],
+        tags_b: np.typing.NDArray[np.int64],
+        coincidence_window: int
+) -> tuple[
+    np.typing.NDArray[np.int64],
+    np.typing.NDArray[np.int64]
+]:
+    tags_a = np.asarray(tags_a, dtype=np.int64)
+    tags_b = np.asarray(tags_b, dtype=np.int64)
+
+    return _find_twofold_coincidence_indices(
         tags_a=tags_a,
         tags_b=tags_b,
         coincidence_window=coincidence_window

@@ -6,6 +6,7 @@ from .misc_functions import (
 
 from .timetagging import (
     count_twofold_coincidences,
+    find_twofold_coincidence_indices,
     count_threefold_coincidences,
     count_fourfold_coincidences,
     count_coincidences
@@ -49,6 +50,7 @@ __all__ = [
     'dB_to_fraction',
 
     'count_twofold_coincidences',
+    'find_twofold_coincidence_indices',
     'count_threefold_coincidences',
     'count_fourfold_coincidences',
     'count_coincidences',
