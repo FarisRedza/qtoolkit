@@ -14,7 +14,8 @@ from .timetagging import (
 
 from .simulate_timetags import (
     CoincidencePair,
-    generate_timetags
+    generate_timetags,
+    LiveTimetagSimulator
 )
 
 from .lab import (
@@ -57,6 +58,7 @@ __all__ = [
 
     'CoincidencePair',
     'generate_timetags',
+    'LiveTimetagSimulator',
 
     'ChannelPair',
     'BasisPairs',
