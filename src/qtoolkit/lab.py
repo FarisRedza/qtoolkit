@@ -36,8 +36,17 @@ class ChannelPair:
     second: int
     name: typing.Optional[str] = None
 
+    @property
+    def channels(
+        self,
+    ) -> tuple[int, int]:
+        return (
+            self.first,
+            self.second,
+        )
+
     def as_tuple(self) -> tuple[int, int]:
-        return self.first, self.second
+        return self.channels
 
 
 BasisPairs = tuple[ChannelPair, ChannelPair, ChannelPair, ChannelPair]
@@ -159,11 +168,32 @@ class BasisMetrics:
         pair_00, pair_01, pair_10, pair_11 = pairs
 
         return cls(
-            c_00=coincidences[pair_00.as_tuple()],
-            c_01=coincidences[pair_01.as_tuple()],
-            c_10=coincidences[pair_10.as_tuple()],
-            c_11=coincidences[pair_11.as_tuple()],
+            c_00=coincidences[
+                (
+                    pair_00.first,
+                    pair_00.second,
+                )
+            ],
+            c_01=coincidences[
+                (
+                    pair_01.first,
+                    pair_01.second,
+                )
+            ],
+            c_10=coincidences[
+                (
+                    pair_10.first,
+                    pair_10.second,
+                )
+            ],
+            c_11=coincidences[
+                (
+                    pair_11.first,
+                    pair_11.second,
+                )
+            ],
         )
+
 
     @property
     def odd(self) -> int:
@@ -614,6 +644,95 @@ class BB84Measurement:
 class BB84MeasurementPair:
     first: BB84Measurement
     second: BB84Measurement
+
+    @property
+    def z_pairs(self) -> BasisPairs:
+        if (
+            self.first.channels.h is None
+            or self.first.channels.v is None
+            or self.second.channels.h is None
+            or self.second.channels.v is None
+        ):
+            raise ValueError(
+                'Z-basis pairs require H and V channels for both measurements.'
+            )
+
+        first_h = self.first.channels.h
+        first_v = self.first.channels.v
+        second_h = self.second.channels.h
+        second_v = self.second.channels.v
+        return (
+            ChannelPair(
+                first_h,
+                second_h,
+                name='HH',
+            ),
+            ChannelPair(
+                first_h,
+                second_v,
+                name='HV',
+            ),
+            ChannelPair(
+                first_v,
+                second_h,
+                name='VH',
+            ),
+            ChannelPair(
+                first_v,
+                second_v,
+                name='VV',
+            ),
+        )
+
+
+    @property
+    def x_pairs(self) -> BasisPairs:
+        if (
+            self.first.channels.d is None
+            or self.first.channels.a is None
+            or self.second.channels.d is None
+            or self.second.channels.a is None
+        ):
+            raise ValueError(
+                'X-basis pairs require D and A channels for both measurements.'
+            )
+
+        first_d = self.first.channels.d
+        first_a = self.first.channels.a
+        second_d = self.second.channels.d
+        second_a = self.second.channels.a
+        return (
+            ChannelPair(
+                first_d,
+                second_d,
+                name='DD',
+            ),
+            ChannelPair(
+                first_d,
+                second_a,
+                name='DA',
+            ),
+            ChannelPair(
+                first_a,
+                second_d,
+                name='AD',
+            ),
+            ChannelPair(
+                first_a,
+                second_a,
+                name='AA',
+            ),
+        )
+
+
+    @property
+    def coincidence_pairs(
+        self,
+    ) -> tuple[ChannelPair, ...]:
+        return (
+            *self.z_pairs,
+            *self.x_pairs,
+        )
 
     def joint_probabilities(
         self,
