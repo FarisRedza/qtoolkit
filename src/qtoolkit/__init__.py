@@ -45,6 +45,11 @@ from .quantum_functions import (
     purity
 )
 
+from .optical_components import (
+    QuarterWavePlate,
+    HalfWavePlate,
+)
+
 __all__ = [
     'binary_entropy',
     'fraction_to_dB',
@@ -82,4 +87,7 @@ __all__ = [
     'fidelity_from_visibility',
     'symmetric_heralding_efficiency',
     'purity',
+
+    'QuarterWavePlate',
+    'HalfWavePlate',
 ]
