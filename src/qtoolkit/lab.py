@@ -13,6 +13,7 @@ from .quantum_functions import (
 from .polarisation import (
     H,V,D,A,
     projection_probability,
+    joint_projection_probability
 )
 
 
@@ -608,3 +609,92 @@ class BB84Measurement:
                 )
             ),
         }
+
+@dataclasses.dataclass(frozen=True)
+class BB84MeasurementPair:
+    first: BB84Measurement
+    second: BB84Measurement
+
+    def joint_probabilities(
+        self,
+        state: np.typing.ArrayLike,
+    ) -> dict[tuple[int, int], float]:
+        """
+        Calculate joint detector probabilities for two BB84 stages.
+        """
+        state_array = np.asarray(
+            state,
+            dtype=complex,
+        )
+
+        first_states = {
+            self.first.channels.h: (
+                H,
+                self.first.z_probability,
+            ),
+            self.first.channels.v: (
+                V,
+                self.first.z_probability,
+            ),
+            self.first.channels.d: (
+                D,
+                self.first.x_probability,
+            ),
+            self.first.channels.a: (
+                A,
+                self.first.x_probability,
+            ),
+        }
+
+        second_states = {
+            self.second.channels.h: (
+                H,
+                self.second.z_probability,
+            ),
+            self.second.channels.v: (
+                V,
+                self.second.z_probability,
+            ),
+            self.second.channels.d: (
+                D,
+                self.second.x_probability,
+            ),
+            self.second.channels.a: (
+                A,
+                self.second.x_probability,
+            ),
+        }
+
+        probabilities = {}
+
+        for (
+            first_channel,
+            (first_state, first_basis_probability),
+        ) in first_states.items():
+
+            for (
+                second_channel,
+                (
+                    second_state,
+                    second_basis_probability,
+                ),
+            ) in second_states.items():
+
+                probability = (
+                    first_basis_probability
+                    * second_basis_probability
+                    * joint_projection_probability(
+                        state=state_array,
+                        first_state=first_state,
+                        second_state=second_state,
+                    )
+                )
+
+                probabilities[
+                    (
+                        first_channel,
+                        second_channel,
+                    )
+                ] = probability
+
+        return probabilities
