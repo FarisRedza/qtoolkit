@@ -10,6 +10,10 @@ from .quantum_functions import (
     visibility_from_qber,
     fidelity_from_visibility
 )
+from .polarisation import (
+    H,V,D,A,
+    projection_probability,
+)
 
 
 @dataclasses.dataclass(frozen=True)
@@ -549,3 +553,58 @@ class BBM92Metrics:
             rows.append(row)
 
         return '\n'.join([header, *rows])
+
+
+@dataclasses.dataclass(frozen=True)
+class BB84Measurement:
+    channels: PolarisationChannelMap
+    z_probability: float = 0.5
+    x_probability: float = 0.5
+
+    def probabilities(
+        self,
+        state: np.typing.ArrayLike,
+    ) -> dict[int, float]:
+        """
+        Calculate detector probabilities for a BB84 measurement stage.
+        """
+        if (
+            self.channels.h is None
+            or self.channels.v is None
+            or self.channels.d is None
+            or self.channels.a is None
+        ):
+            raise ValueError(
+                'BB84 measurement requires H, V, D, and A channels.'
+            )
+
+        return {
+            self.channels.h: (
+                self.z_probability
+                * projection_probability(
+                    state,
+                    H,
+                )
+            ),
+            self.channels.v: (
+                self.z_probability
+                * projection_probability(
+                    state,
+                    V,
+                )
+            ),
+            self.channels.d: (
+                self.x_probability
+                * projection_probability(
+                    state,
+                    D,
+                )
+            ),
+            self.channels.a: (
+                self.x_probability
+                * projection_probability(
+                    state,
+                    A,
+                )
+            ),
+        }

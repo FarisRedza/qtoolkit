@@ -27,7 +27,8 @@ from .lab import (
     TimetagData,
     ProcessedTimetagData,
     BBM92ChannelMap,
-    BBM92Metrics
+    BBM92Metrics,
+    BB84Measurement
 )
 
 from .quantum_functions import (
@@ -87,6 +88,7 @@ __all__ = [
     'ProcessedTimetagData',
     'BBM92ChannelMap',
     'BBM92Metrics',
+    'BB84Measurement',
 
     'qber',
     'qber_from_coincidences',
