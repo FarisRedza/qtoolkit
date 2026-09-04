@@ -580,6 +580,44 @@ class LiveTimetagSimulator:
             channel_arrays,
         )
 
+    def set_channel_rates(
+        self,
+        channel_rates: typing.Mapping[int, float],
+    ) -> None:
+        """
+        Set the expected final singles rates.
+
+        The new rates take effect on the next call to :meth:`read`.
+        """
+        channel_rates = dict(channel_rates)
+
+        independent_rates = _calculate_independent_rates(
+            channel_rates=channel_rates,
+            coincidence_pairs=self._coincidence_pairs,
+        )
+
+        self._channel_rates = channel_rates
+        self._independent_rates = independent_rates
+
+    def set_coincidence_pairs(
+        self,
+        coincidence_pairs: typing.Sequence[CoincidencePair],
+    ) -> None:
+        """
+        Set the genuine coincidence processes.
+
+        The new coincidence rates take effect on the next call to :meth:`read`.
+        """
+        coincidence_pairs = tuple(coincidence_pairs)
+
+        independent_rates = _calculate_independent_rates(
+            channel_rates=self._channel_rates,
+            coincidence_pairs=coincidence_pairs,
+        )
+
+        self._coincidence_pairs = coincidence_pairs
+        self._independent_rates = independent_rates
+
     @staticmethod
     def _split_current_and_future(
         timetags: np.typing.NDArray[np.int64],
