@@ -52,6 +52,17 @@ from .optical_components import (
     compose_waveplates
 )
 
+from .polarisation import (
+    PolarisationState,
+    JonesMatrix,
+    H,V,D,A,R,L,
+    PHI_PLUS,PHI_MINUS,PSI_PLUS,PSI_MINUS,
+    apply_jones_matrix,
+    apply_local_jones_matrix,
+    projection_probability,
+    joint_projection_probability
+)
+
 __all__ = [
     'binary_entropy',
     'fraction_to_dB',
@@ -93,5 +104,14 @@ __all__ = [
     'WavePlate',
     'QuarterWavePlate',
     'HalfWavePlate',
-    'compose_waveplates'
+    'compose_waveplates',
+
+    'PolarisationState',
+    'JonesMatrix',
+    'H','V','D','A','R','L',
+    'PHI_PLUS','PHI_MINUS','PSI_PLUS','PSI_MINUS',
+    'apply_jones_matrix',
+    'apply_local_jones_matrix',
+    'projection_probability',
+    'joint_projection_probability',
 ]
