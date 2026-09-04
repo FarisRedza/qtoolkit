@@ -959,3 +959,39 @@ class LiveTimetagSimulator:
             0,
             dtype=np.int8,
         )
+
+
+def coincidence_pairs_from_probabilities(
+    probabilities: typing.Mapping[
+        tuple[int, int],
+        float,
+    ],
+    pair_rate_hz: float,
+    delay_ps: int = 0,
+    jitter_ps: float = 0.0,
+) -> list[CoincidencePair]:
+    """
+    Convert detector-pair probabilities into simulated coincidence processes.
+    """
+    if pair_rate_hz < 0:
+        raise ValueError(
+            'pair_rate_hz must be non-negative.'
+        )
+
+    return [
+        CoincidencePair(
+            channel_a=channel_a,
+            channel_b=channel_b,
+            rate_hz=(
+                pair_rate_hz
+                * probability
+            ),
+            delay_ps=delay_ps,
+            jitter_ps=jitter_ps,
+        )
+        for (
+            channel_a,
+            channel_b,
+        ), probability
+        in probabilities.items()
+    ]
