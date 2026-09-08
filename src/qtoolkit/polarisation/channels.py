@@ -1,7 +1,7 @@
 import dataclasses
 import typing
 
-from ..timetags import ChannelMap
+from ..timetags.channels import ChannelMap
 
 
 @dataclasses.dataclass(frozen=True)

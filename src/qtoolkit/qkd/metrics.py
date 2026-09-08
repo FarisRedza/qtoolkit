@@ -4,7 +4,7 @@ import dataclasses
 import numpy as np
 import numpy.typing as npt
 
-from ..timetags import ChannelPair
+from ..timetags.channels import ChannelPair
 
 # qber functions
 

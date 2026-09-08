@@ -3,11 +3,11 @@ import dataclasses
 import numpy as np
 import numpy.typing as npt
 
-from ..timetags import (
-    PolarisationChannelMap,
+from ..timetags.channels import (
     BasisPairs,
     ChannelPair,
 )
+from ..polarisation.channels import PolarisationChannelMap
 
 from .states import (
     H,V,D,A

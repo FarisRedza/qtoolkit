@@ -5,19 +5,21 @@ import pathlib
 import numpy as np
 import numpy.typing as npt
 
-from ..qkd import BasisMetrics
+# from ..qkd.metrics import BasisMetrics
 
-from .channels import (
-    ChannelPair,
-    BasisPairs,
-)
-from .coincidences import count_coincidences
+# from .channels import (
+#     ChannelPair,
+#     BasisPairs,
+# )
+# from .coincidences import count_coincidences
 
 
 @dataclasses.dataclass(frozen=True)
 class TimetagData:
     timetags: npt.NDArray[np.int64]
     channels: npt.NDArray[np.int8]
+    start_ps: typing.Optional[int] = None
+    stop_ps: typing.Optional[int] = None
     file_path: typing.Optional[pathlib.Path] = None
 
     @classmethod
@@ -58,7 +60,24 @@ class TimetagData:
         )
 
     @property
-    def duration_ps(self) -> int:
+    def duration_ps(self) -> typing.Optional[int]:
+        if (
+            self.start_ps is None
+            or self.stop_ps is None
+        ):
+            return None
+
+        return self.stop_ps - self.start_ps
+
+    @property
+    def duration(self) -> typing.Optional[float]:
+        if self.duration_ps is None:
+            return None
+
+        return self.duration_ps * 1e-12
+
+    @property
+    def span_ps(self) -> int:
         if len(self) < 2:
             return 0
 
@@ -132,69 +151,69 @@ class TimetagData:
                 'timetags and channels must have the same length.'
             )
 
-@dataclasses.dataclass(frozen=True)
-class ProcessedTimetagData:
-    coincidences: dict[tuple[int, int], int]
-    coincidence_window: int
-    file_path: typing.Optional[pathlib.Path] = None
+# @dataclasses.dataclass(frozen=True)
+# class ProcessedTimetagData:
+#     coincidences: dict[tuple[int, int], int]
+#     coincidence_window: int
+#     file_path: typing.Optional[pathlib.Path] = None
 
-    @classmethod
-    def from_timetag_data(
-            cls,
-            timetag_data: TimetagData,
-            pairs: typing.Iterable[
-                typing.Union[ChannelPair, tuple[int, int]]
-            ],
-            coincidence_window: int
-    ) -> 'ProcessedTimetagData':
-        pairs = tuple(
-            pair.as_tuple()
-            if isinstance(pair, ChannelPair)
-            else pair
-            for pair in pairs
-        )
-        coincidences = count_coincidences(
-            data=timetag_data,
-            pairs=pairs,
-            coincidence_window=coincidence_window
-        )
-        return cls(
-            coincidences=coincidences,
-            coincidence_window=coincidence_window,
-            file_path=timetag_data.file_path
-        )
+#     @classmethod
+#     def from_timetag_data(
+#             cls,
+#             timetag_data: TimetagData,
+#             pairs: typing.Iterable[
+#                 typing.Union[ChannelPair, tuple[int, int]]
+#             ],
+#             coincidence_window: int
+#     ) -> 'ProcessedTimetagData':
+#         pairs = tuple(
+#             pair.as_tuple()
+#             if isinstance(pair, ChannelPair)
+#             else pair
+#             for pair in pairs
+#         )
+#         coincidences = count_coincidences(
+#             data=timetag_data,
+#             pairs=pairs,
+#             coincidence_window=coincidence_window
+#         )
+#         return cls(
+#             coincidences=coincidences,
+#             coincidence_window=coincidence_window,
+#             file_path=timetag_data.file_path
+#         )
 
-    @classmethod
-    def from_file(
-            cls,
-            file_path: typing.Union[pathlib.Path, str],
-            pairs: list[ChannelPair],
-            coincidence_window: int
-    ) -> 'ProcessedTimetagData':
-        timetag_data = TimetagData.from_file(file_path=file_path)
-        return cls.from_timetag_data(
-            timetag_data=timetag_data,
-            pairs=pairs,
-            coincidence_window=coincidence_window
-        )
+#     @classmethod
+#     def from_file(
+#             cls,
+#             file_path: typing.Union[pathlib.Path, str],
+#             pairs: list[ChannelPair],
+#             coincidence_window: int
+#     ) -> 'ProcessedTimetagData':
+#         timetag_data = TimetagData.from_file(file_path=file_path)
+#         return cls.from_timetag_data(
+#             timetag_data=timetag_data,
+#             pairs=pairs,
+#             coincidence_window=coincidence_window
+#         )
 
-    def get_basis_metrics(
-            self,
-            pairs: BasisPairs,
-    ) -> 'BasisMetrics':
-        """
-        Calculate metrics for a set of basis channel pairs.
+#     def get_basis_metrics(
+#             self,
+#             pairs: BasisPairs,
+#     ) -> 'BasisMetrics':
+#         """
+#         Calculate metrics for a set of basis channel pairs.
 
-        Parameters
-        ----------
-        pairs : BasisPairs
-            Channel pairs corresponding to the outcomes 00, 01, 10, and 11.
+#         Parameters
+#         ----------
+#         pairs : BasisPairs
+#             Channel pairs corresponding to the outcomes 00, 01, 10, and 11.
 
-        Returns
-        -------
-        BasisMetrics
-        """
-        return BasisMetrics.from_coincidences(
-            coincidences=self.coincidences,
-            pairs=pairs,
-        )
+#         Returns
+#         -------
+#         BasisMetrics
+#         """
+#         return BasisMetrics.from_coincidences(
+#             coincidences=self.coincidences,
+#             pairs=pairs,
+#         )
