@@ -1,9 +1,9 @@
 import numpy as np
+import numpy.typing as npt
 
-PolarisationState = np.typing.NDArray[np.complex128]
-JonesMatrix = np.typing.NDArray[np.complex128]
 
-# polarisation states
+PolarisationState = npt.NDArray[np.complex128]
+JonesMatrix = npt.NDArray[np.complex128]
 
 H: PolarisationState = np.array(
     [1.0, 0.0],
@@ -54,12 +54,11 @@ PSI_MINUS: PolarisationState = (
     - np.kron(V, H)
 ) / np.sqrt(2)
 
-
 # state transformations
 
 def apply_jones_matrix(
-    state: np.typing.ArrayLike,
-    matrix: np.typing.ArrayLike,
+    state: npt.ArrayLike,
+    matrix: npt.ArrayLike,
 ) -> PolarisationState:
     """
     Apply a Jones matrix to a single-photon polarisation state.
@@ -88,8 +87,8 @@ def apply_jones_matrix(
 
 
 def apply_local_jones_matrix(
-    state: np.typing.ArrayLike,
-    matrix: np.typing.ArrayLike,
+    state: npt.ArrayLike,
+    matrix: npt.ArrayLike,
     subsystem: int,
 ) -> PolarisationState:
     """
@@ -147,63 +146,4 @@ def apply_local_jones_matrix(
     return np.asarray(
         transformation @ state_array,
         dtype=np.complex128,
-    )
-
-
-# measurement probabilities
-
-def projection_probability(
-    state: np.typing.ArrayLike,
-    measurement_state: np.typing.ArrayLike,
-) -> float:
-    """
-    Probability of projecting onto a measurement state.
-    """
-    state_array = np.asarray(
-        state,
-        dtype=complex,
-    )
-
-    measurement_array = np.asarray(
-        measurement_state,
-        dtype=complex,
-    )
-
-    if state_array.shape != measurement_array.shape:
-        raise ValueError(
-            'state and measurement_state must have the same shape.'
-        )
-
-    amplitude = np.vdot(
-        measurement_array,
-        state_array,
-    )
-
-    return float(
-        abs(amplitude) ** 2
-    )
-
-
-def joint_projection_probability(
-    state: np.typing.ArrayLike,
-    first_state: np.typing.ArrayLike,
-    second_state: np.typing.ArrayLike,
-) -> float:
-    """
-    Probability of jointly measuring two polarisation states.
-    """
-    measurement_state = np.kron(
-        np.asarray(
-            first_state,
-            dtype=complex,
-        ),
-        np.asarray(
-            second_state,
-            dtype=complex,
-        ),
-    )
-
-    return projection_probability(
-        state=state,
-        measurement_state=measurement_state,
     )

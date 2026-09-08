@@ -1,12 +1,14 @@
 import typing
 
 import numpy as np
+import numpy.typing as npt
 import numba
+
 
 @numba.njit(cache=True)
 def _count_twofold_coincidences(
-        tags_a: np.typing.NDArray[np.int64],
-        tags_b: np.typing.NDArray[np.int64],
+        tags_a: npt.NDArray[np.int64],
+        tags_b: npt.NDArray[np.int64],
         coincidence_window: int
 ) -> int:
     idx_a = 0
@@ -35,12 +37,12 @@ def _count_twofold_coincidences(
 
 @numba.njit(cache=True)
 def _find_twofold_coincidence_indices(
-        tags_a: np.typing.NDArray[np.int64],
-        tags_b: np.typing.NDArray[np.int64],
+        tags_a: npt.NDArray[np.int64],
+        tags_b: npt.NDArray[np.int64],
         coincidence_window: int
 ) -> tuple[
-    np.typing.NDArray[np.int64],
-    np.typing.NDArray[np.int64]
+    npt.NDArray[np.int64],
+    npt.NDArray[np.int64]
 ]:
     idx_a = 0
     idx_b = 0
@@ -89,9 +91,9 @@ def _find_twofold_coincidence_indices(
 
 @numba.njit(cache=True)
 def _count_threefold_coincidences(
-        tags_a: np.typing.NDArray[np.int64],
-        tags_b: np.typing.NDArray[np.int64],
-        tags_c: np.typing.NDArray[np.int64],
+        tags_a: npt.NDArray[np.int64],
+        tags_b: npt.NDArray[np.int64],
+        tags_c: npt.NDArray[np.int64],
         coincidence_window: int
 ) -> int:
     idx_a = 0
@@ -130,10 +132,10 @@ def _count_threefold_coincidences(
 
 @numba.njit(cache=True)
 def _count_fourfold_coincidences(
-        tags_a: np.typing.NDArray[np.int64],
-        tags_b: np.typing.NDArray[np.int64],
-        tags_c: np.typing.NDArray[np.int64],
-        tags_d: np.typing.NDArray[np.int64],
+        tags_a: npt.NDArray[np.int64],
+        tags_b: npt.NDArray[np.int64],
+        tags_c: npt.NDArray[np.int64],
+        tags_d: npt.NDArray[np.int64],
         coincidence_window: int
 ) -> int:
     idx_a = 0
@@ -178,8 +180,8 @@ def _count_fourfold_coincidences(
     return counts
 
 def count_twofold_coincidences(
-        tags_a: typing.Union[list[int], np.typing.NDArray[np.int64]],
-        tags_b: typing.Union[list[int], np.typing.NDArray[np.int64]],
+        tags_a: typing.Union[list[int], npt.NDArray[np.int64]],
+        tags_b: typing.Union[list[int], npt.NDArray[np.int64]],
         coincidence_window: int
 ) -> int:
     """
@@ -188,9 +190,9 @@ def count_twofold_coincidences(
 
     Parameters
     ----------
-        tags_a: list[int] | np.typing.NDArray[np.int64]
+        tags_a: list[int] | npt.NDArray[np.int64]
             List/array of timetags
-        tags_b: list[int] | np.typing.NDArray[np.int64]
+        tags_b: list[int] | npt.NDArray[np.int64]
             List/array of timetags
         coincidence_window: int
             The coincidence window (ps)
@@ -210,12 +212,12 @@ def count_twofold_coincidences(
     )
 
 def find_twofold_coincidence_indices(
-        tags_a: np.typing.NDArray[np.int64],
-        tags_b: np.typing.NDArray[np.int64],
+        tags_a: npt.NDArray[np.int64],
+        tags_b: npt.NDArray[np.int64],
         coincidence_window: int
 ) -> tuple[
-    np.typing.NDArray[np.int64],
-    np.typing.NDArray[np.int64]
+    npt.NDArray[np.int64],
+    npt.NDArray[np.int64]
 ]:
     tags_a = np.asarray(tags_a, dtype=np.int64)
     tags_b = np.asarray(tags_b, dtype=np.int64)
@@ -227,9 +229,9 @@ def find_twofold_coincidence_indices(
     )
 
 def count_threefold_coincidences(
-        tags_a: typing.Union[list[int], np.typing.NDArray[np.int64]],
-        tags_b: typing.Union[list[int], np.typing.NDArray[np.int64]],
-        tags_c: typing.Union[list[int], np.typing.NDArray[np.int64]],
+        tags_a: typing.Union[list[int], npt.NDArray[np.int64]],
+        tags_b: typing.Union[list[int], npt.NDArray[np.int64]],
+        tags_c: typing.Union[list[int], npt.NDArray[np.int64]],
         coincidence_window: int
 ) -> int:
     """
@@ -238,11 +240,11 @@ def count_threefold_coincidences(
 
     Parameters
     ----------
-        tags_a: list[int] | np.typing.NDArray[np.int64]
+        tags_a: list[int] | npt.NDArray[np.int64]
             List/array of timetags
-        tags_b: list[int] | np.typing.NDArray[np.int64]
+        tags_b: list[int] | npt.NDArray[np.int64]
             List/array of timetags
-        tags_c: list[int] | np.typing.NDArray[np.int64]
+        tags_c: list[int] | npt.NDArray[np.int64]
             List/array of timetags
         coincidence_window: int
             The coincidence window (ps)
@@ -264,10 +266,10 @@ def count_threefold_coincidences(
     )
 
 def count_fourfold_coincidences(
-        tags_a: typing.Union[list[int], np.typing.NDArray[np.int64]],
-        tags_b: typing.Union[list[int], np.typing.NDArray[np.int64]],
-        tags_c: typing.Union[list[int], np.typing.NDArray[np.int64]],
-        tags_d: typing.Union[list[int], np.typing.NDArray[np.int64]],
+        tags_a: typing.Union[list[int], npt.NDArray[np.int64]],
+        tags_b: typing.Union[list[int], npt.NDArray[np.int64]],
+        tags_c: typing.Union[list[int], npt.NDArray[np.int64]],
+        tags_d: typing.Union[list[int], npt.NDArray[np.int64]],
         coincidence_window: int
 ) -> int:
     """
@@ -276,13 +278,13 @@ def count_fourfold_coincidences(
 
     Parameters
     ----------
-        tags_a: list[int] | np.typing.NDArray[np.int64]
+        tags_a: list[int] | npt.NDArray[np.int64]
             List/array of timetags
-        tags_b: list[int] | np.typing.NDArray[np.int64]
+        tags_b: list[int] | npt.NDArray[np.int64]
             List/array of timetags
-        tags_c: list[int] | np.typing.NDArray[np.int64]
+        tags_c: list[int] | npt.NDArray[np.int64]
             List/array of timetags
-        tags_d: list[int] | np.typing.NDArray[np.int64]
+        tags_d: list[int] | npt.NDArray[np.int64]
             List/array of timetags
         coincidence_window: int
             The coincidence window (ps)
@@ -306,8 +308,8 @@ def count_fourfold_coincidences(
     )
 
 def count_coincidences(
-    timetags: np.typing.ArrayLike,
-    channels: np.typing.ArrayLike,
+    timetags: npt.ArrayLike,
+    channels: npt.ArrayLike,
     pairs: typing.Iterable[tuple[int, int]],
     coincidence_window: int,
 ) -> dict[tuple[int, int], int]:
@@ -316,10 +318,10 @@ def count_coincidences(
 
     Parameters
     ----------
-    timetags: np.typing.ArrayLike
+    timetags: npt.ArrayLike
         Chronologically ordered timetags.
 
-    channels: np.typing.ArrayLike
+    channels: npt.ArrayLike
         Channel corresponding to each timetag.
 
     pairs: list[tuple[int, int]]
