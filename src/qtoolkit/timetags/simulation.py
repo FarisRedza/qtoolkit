@@ -6,12 +6,12 @@ import numpy as np
 import numpy.typing as npt
 
 from .data import TimetagData
+from .channels import ChannelPair
 
 
 @dataclasses.dataclass(frozen=True)
 class CoincidenceProcess:
-    channel_a: int
-    channel_b: int
+    channels: ChannelPair
     rate_hz: float
     delay_ps: int = 0
     jitter_ps: float = 0.0
@@ -32,7 +32,7 @@ def _validate_duration_s(duration_s: float) -> None:
 
 def _calculate_independent_rates(
     channel_rates: typing.Mapping[int, float],
-    coincidence_pairs: typing.Sequence[CoincidenceProcess],
+    coincidence_processes: typing.Sequence[CoincidenceProcess],
 ) -> dict[int, float]:
     """
     Validate a simulation configuration and calculate independent singles rates.
@@ -75,15 +75,15 @@ def _calculate_independent_rates(
         for channel in channel_rates
     }
 
-    for pair in coincidence_pairs:
-        if pair.channel_a not in channel_rates:
+    for pair in coincidence_processes:
+        if pair.channels.first not in channel_rates:
             raise ValueError(
-                f'Channel {pair.channel_a} has no singles rate.'
+                f'Channel {pair.channels.first} has no singles rate.'
             )
 
-        if pair.channel_b not in channel_rates:
+        if pair.channels.second not in channel_rates:
             raise ValueError(
-                f'Channel {pair.channel_b} has no singles rate.'
+                f'Channel {pair.channels.second} has no singles rate.'
             )
 
         if not np.isfinite(pair.rate_hz):
@@ -106,8 +106,8 @@ def _calculate_independent_rates(
                 'jitter_ps must be non-negative.'
             )
 
-        coincidence_rates[pair.channel_a] += pair.rate_hz
-        coincidence_rates[pair.channel_b] += pair.rate_hz
+        coincidence_rates[pair.channels.first] += pair.rate_hz
+        coincidence_rates[pair.channels.second] += pair.rate_hz
 
     independent_rates: dict[int, float] = {}
 
@@ -220,7 +220,7 @@ def _generate_timetags(
 
     independent_rates = _calculate_independent_rates(
         channel_rates=channel_rates,
-        coincidence_pairs=coincidence_pairs,
+        coincidence_processes=coincidence_pairs,
     )
 
     duration_ps = (
@@ -289,12 +289,12 @@ def _generate_timetags(
             [
                 np.full(
                     len(timetags_a),
-                    pair.channel_a,
+                    pair.channels.first,
                     dtype=np.int8,
                 ),
                 np.full(
                     len(timetags_b),
-                    pair.channel_b,
+                    pair.channels.second,
                     dtype=np.int8,
                 ),
             ]
@@ -416,7 +416,7 @@ class LiveTimetagSimulator:
         self._independent_rates = (
             _calculate_independent_rates(
                 channel_rates=self._channel_rates,
-                coincidence_pairs=self._coincidence_pairs,
+                coincidence_processes=self._coincidence_pairs,
             )
         )
 
@@ -550,7 +550,7 @@ class LiveTimetagSimulator:
 
             self._split_current_and_future(
                 timetags=timetags_a,
-                channel=pair.channel_a,
+                channel=pair.channels.first,
                 end_ps=end_ps,
                 current_timetags=timetag_arrays,
                 current_channels=channel_arrays,
@@ -560,7 +560,7 @@ class LiveTimetagSimulator:
 
             self._split_current_and_future(
                 timetags=timetags_b,
-                channel=pair.channel_b,
+                channel=pair.channels.second,
                 end_ps=end_ps,
                 current_timetags=timetag_arrays,
                 current_channels=channel_arrays,
@@ -596,7 +596,7 @@ class LiveTimetagSimulator:
 
         independent_rates = _calculate_independent_rates(
             channel_rates=channel_rates,
-            coincidence_pairs=self._coincidence_pairs,
+            coincidence_processes=self._coincidence_pairs,
         )
 
         self._channel_rates = channel_rates
@@ -615,7 +615,7 @@ class LiveTimetagSimulator:
 
         independent_rates = _calculate_independent_rates(
             channel_rates=self._channel_rates,
-            coincidence_pairs=coincidence_pairs,
+            coincidence_processes=coincidence_pairs,
         )
 
         self._coincidence_pairs = coincidence_pairs
@@ -983,8 +983,10 @@ def coincidence_processes_from_probabilities(
 
     return [
         CoincidenceProcess(
-            channel_a=channel_a,
-            channel_b=channel_b,
+            channels=ChannelPair(
+                first=channel_a,
+                second=channel_b
+            ),
             rate_hz=(
                 pair_rate_hz
                 * probability

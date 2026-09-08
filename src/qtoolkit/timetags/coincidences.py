@@ -5,6 +5,7 @@ import numpy.typing as npt
 import numba
 
 from .data import TimetagData
+from .channels import ChannelPair
 
 
 @numba.njit(cache=True)
@@ -378,7 +379,7 @@ def _count_coincidences(
 
 def count_coincidences(
     data: TimetagData,
-    pairs: typing.Iterable[tuple[int, int]],
+    pairs: typing.Iterable[ChannelPair],
     coincidence_window: int,
 ) -> dict[tuple[int, int], int]:
     """
@@ -400,6 +401,9 @@ def count_coincidences(
     dict
         Mapping ``(channel_a, channel_b)`` to coincidence count.
     """
+    for i, p in enumerate(pairs):
+        if isinstance(p,ChannelPair):
+            pairs[i] = p.as_tuple()
 
     coincidences = _count_coincidences(
         timetags=data.timetags,
