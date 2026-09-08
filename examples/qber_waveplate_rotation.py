@@ -3,18 +3,23 @@ from typing import cast
 
 import numpy as np
 
-from qtoolkit import (
+from qtoolkit.polarisation import (
     PHI_PLUS,
     BB84Measurement,
     BB84MeasurementPair,
     HalfWavePlate,
-    LiveTimetagSimulator,
-    PolarisationChannelMap,
     QuarterWavePlate,
+    PolarisationChannelMap,
     apply_local_jones_matrix,
-    coincidence_pairs_from_probabilities,
     compose_waveplates,
-    count_coincidences,
+)
+from qtoolkit.timetags import (
+    LiveTimetagSimulator,
+    coincidence_pairs_from_probabilities,
+    count_coincidences
+)
+
+from qtoolkit.qkd import (
     qber_from_coincidences,
 )
 
@@ -356,8 +361,7 @@ for step in range(
     }
 
     coincidences = count_coincidences(
-        timetags=data.timetags,
-        channels=data.channels,
+        data=data,
         pairs=cast(
             list[tuple[int, int]],
             pairs_to_measure,
