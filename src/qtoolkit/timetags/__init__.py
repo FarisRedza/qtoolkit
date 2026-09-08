@@ -2,7 +2,6 @@ from .channels import (
     ChannelPair,
     BasisPairs,
     ChannelMap,
-    PolarisationChannelMap,
 )
 
 from .coincidences import (
@@ -29,7 +28,6 @@ __all__ = [
     'ChannelPair',
     'BasisPairs',
     'ChannelMap',
-    'PolarisationChannelMap',
 
     'count_twofold_coincidences',
     'find_twofold_coincidence_indices',

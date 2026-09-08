@@ -1,3 +1,7 @@
+from .channels import (
+    PolarisationChannelMap,
+)
+
 from .measurement import (
     projection_probability,
     joint_projection_probability,
@@ -22,6 +26,8 @@ from .states import (
 )
 
 __all__ = [
+    'PolarisationChannelMap',
+
     'projection_probability',
     'joint_projection_probability',
     'BB84Measurement',

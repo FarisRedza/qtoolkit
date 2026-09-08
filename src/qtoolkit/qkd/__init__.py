@@ -1,3 +1,8 @@
+from .bbm92 import (
+    BBM92ChannelMap,
+    BBM92Metrics,
+)
+
 from .metrics import (
     qber,
     qber_from_coincidences,
@@ -10,11 +15,12 @@ from .metrics import (
     fidelity_from_qber,
     purity,
     BasisMetrics,
-    BBM92ChannelMap,
-    BBM92Metrics,
 )
 
 __all__ = [
+    'BBM92ChannelMap',
+    'BBM92Metrics',
+
     'qber',
     'qber_from_coincidences',
     'qz','qx','qy',
@@ -26,6 +32,4 @@ __all__ = [
     'fidelity_from_qber',
     'purity',
     'BasisMetrics',
-    'BBM92ChannelMap',
-    'BBM92Metrics',
 ]
