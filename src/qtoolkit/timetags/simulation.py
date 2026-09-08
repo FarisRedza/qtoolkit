@@ -5,7 +5,7 @@ import typing
 import numpy as np
 import numpy.typing as npt
 
-from .lab import TimetagData
+from .data import TimetagData
 
 
 @dataclasses.dataclass(frozen=True)
@@ -136,12 +136,12 @@ def _generate_independent_events(
     duration_s: float,
     rng: np.random.Generator,
 ) -> tuple[
-    list[npt.ing.NDArray[np.int64]],
-    list[npt.ing.NDArray[np.int8]],
+    list[npt.NDArray[np.int64]],
+    list[npt.NDArray[np.int8]],
 ]:
     """Generate independent singles events for one acquisition interval."""
-    timetag_arrays: list[npt.ing.NDArray[np.int64]] = []
-    channel_arrays: list[npt.ing.NDArray[np.int8]] = []
+    timetag_arrays: list[npt.NDArray[np.int64]] = []
+    channel_arrays: list[npt.NDArray[np.int8]] = []
 
     for channel, rate_hz in independent_rates.items():
         number_of_events = rng.poisson(
@@ -171,14 +171,14 @@ def _generate_independent_events(
 
 def _combine_and_sort_events(
     timetag_arrays: typing.Sequence[
-        npt.ing.NDArray[np.int64]
+        npt.NDArray[np.int64]
     ],
     channel_arrays: typing.Sequence[
-        npt.ing.NDArray[np.int8]
+        npt.NDArray[np.int8]
     ],
 ) -> tuple[
-    npt.ing.NDArray[np.int64],
-    npt.ing.NDArray[np.int8],
+    npt.NDArray[np.int64],
+    npt.NDArray[np.int8],
 ]:
     """Combine event arrays and sort them chronologically."""
     if not timetag_arrays:
@@ -207,8 +207,8 @@ def _generate_timetags(
     duration_s: float,
     rng: typing.Optional[np.random.Generator] = None,
 ) -> tuple[
-    npt.ing.NDArray[np.int64],
-    npt.ing.NDArray[np.int8],
+    npt.NDArray[np.int64],
+    npt.NDArray[np.int8],
 ]:
     """
     Generate one finite simulated acquisition.
@@ -462,8 +462,8 @@ class LiveTimetagSimulator:
         end_ps: int,
         duration_s: float,
     ) -> tuple[
-        list[npt.ing.NDArray[np.int64]],
-        list[npt.ing.NDArray[np.int8]],
+        list[npt.NDArray[np.int64]],
+        list[npt.NDArray[np.int8]],
     ]:
         """
         Generate genuine coincidence events for one live block.
@@ -473,19 +473,19 @@ class LiveTimetagSimulator:
         in a future block.
         """
         timetag_arrays: list[
-            npt.ing.NDArray[np.int64]
+            npt.NDArray[np.int64]
         ] = []
 
         channel_arrays: list[
-            npt.ing.NDArray[np.int8]
+            npt.NDArray[np.int8]
         ] = []
 
         future_timetags: list[
-            npt.ing.NDArray[np.int64]
+            npt.NDArray[np.int64]
         ] = []
 
         future_channels: list[
-            npt.ing.NDArray[np.int8]
+            npt.NDArray[np.int8]
         ] = []
 
         for pair in self._coincidence_pairs:
@@ -621,20 +621,20 @@ class LiveTimetagSimulator:
 
     @staticmethod
     def _split_current_and_future(
-        timetags: npt.ing.NDArray[np.int64],
+        timetags: npt.NDArray[np.int64],
         channel: int,
         end_ps: int,
         current_timetags: list[
-            npt.ing.NDArray[np.int64]
+            npt.NDArray[np.int64]
         ],
         current_channels: list[
-            npt.ing.NDArray[np.int8]
+            npt.NDArray[np.int8]
         ],
         future_timetags: list[
-            npt.ing.NDArray[np.int64]
+            npt.NDArray[np.int64]
         ],
         future_channels: list[
-            npt.ing.NDArray[np.int8]
+            npt.NDArray[np.int8]
         ],
     ) -> None:
         """Split generated events at the current read boundary."""
@@ -682,8 +682,8 @@ class LiveTimetagSimulator:
 
     def _append_pending(
         self,
-        timetags: npt.ing.NDArray[np.int64],
-        channels: npt.ing.NDArray[np.int8],
+        timetags: npt.NDArray[np.int64],
+        channels: npt.NDArray[np.int8],
     ) -> None:
         """Add events to the future-event queue."""
         if len(timetags) == 0:
@@ -712,8 +712,8 @@ class LiveTimetagSimulator:
         self,
         end_ps: int,
     ) -> tuple[
-        npt.ing.NDArray[np.int64],
-        npt.ing.NDArray[np.int8],
+        npt.NDArray[np.int64],
+        npt.NDArray[np.int8],
     ]:
         """
         Remove and return pending events belonging to the current block.
@@ -819,11 +819,11 @@ class LiveTimetagSimulator:
         )
 
         timetag_arrays: list[
-            npt.ing.NDArray[np.int64]
+            npt.NDArray[np.int64]
         ] = []
 
         channel_arrays: list[
-            npt.ing.NDArray[np.int8]
+            npt.NDArray[np.int8]
         ] = []
 
         pending_timetags, pending_channels = (
