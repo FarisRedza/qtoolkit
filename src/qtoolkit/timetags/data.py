@@ -70,7 +70,7 @@ class TimetagData:
         return self.stop_ps - self.start_ps
 
     @property
-    def duration(self) -> typing.Optional[float]:
+    def duration_s(self) -> typing.Optional[float]:
         if self.duration_ps is None:
             return None
 
@@ -133,7 +133,9 @@ class TimetagData:
         return TimetagData(
             timetags=self.timetags[mask],
             channels=self.channels[mask],
-            file_path=self.file_path
+            file_path=self.file_path,
+            start_ps=self.start_ps,
+            stop_ps=self.stop_ps
         )
 
     def __len__(self) -> int:
@@ -149,6 +151,11 @@ class TimetagData:
         if len(self.timetags) != len(self.channels):
             raise ValueError(
                 'timetags and channels must have the same length.'
+            )
+
+        if np.any(self.timetags[1:] < self.timetags[:-1]):
+            raise ValueError(
+                'timetags must be sorted in ascending order.'
             )
 
 # @dataclasses.dataclass(frozen=True)

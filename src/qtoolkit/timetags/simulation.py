@@ -356,6 +356,8 @@ def generate_timetags(
     return TimetagData(
         timetags=timetags,
         channels=channels,
+        start_ps=0,
+        stop_ps=round(duration_s*1e12)
     )
 
 
