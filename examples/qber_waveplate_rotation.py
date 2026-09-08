@@ -15,7 +15,7 @@ from qtoolkit.polarisation import (
 )
 from qtoolkit.timetags import (
     LiveTimetagSimulator,
-    coincidence_pairs_from_probabilities,
+    coincidence_processes_from_probabilities,
     count_coincidences
 )
 
@@ -171,7 +171,7 @@ initial_probabilities = (
 # Convert those probabilities into genuine coincidence processes.
 
 initial_coincidence_pairs = (
-    coincidence_pairs_from_probabilities(
+    coincidence_processes_from_probabilities(
         probabilities=initial_probabilities,
         pair_rate_hz=PAIR_RATE_HZ,
         delay_ps=COINCIDENCE_DELAY_PS,
@@ -315,8 +315,8 @@ for step in range(
 
     # Update the live simulator
 
-    simulator.set_coincidence_pairs(
-        coincidence_pairs_from_probabilities(
+    simulator.set_coincidence_processes(
+        coincidence_processes_from_probabilities(
             probabilities=probabilities,
             pair_rate_hz=PAIR_RATE_HZ,
             delay_ps=COINCIDENCE_DELAY_PS,

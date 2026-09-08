@@ -602,7 +602,7 @@ class LiveTimetagSimulator:
         self._channel_rates = channel_rates
         self._independent_rates = independent_rates
 
-    def set_coincidence_pairs(
+    def set_coincidence_processes(
         self,
         coincidence_pairs: typing.Sequence[CoincidenceProcess],
     ) -> None:
@@ -964,7 +964,7 @@ class LiveTimetagSimulator:
         )
 
 
-def coincidence_pairs_from_probabilities(
+def coincidence_processes_from_probabilities(
     probabilities: typing.Mapping[
         tuple[int, int],
         float,

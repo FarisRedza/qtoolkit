@@ -21,7 +21,7 @@ from .simulation import (
     CoincidenceProcess,
     generate_timetags,
     LiveTimetagSimulator,
-    coincidence_pairs_from_probabilities,
+    coincidence_processes_from_probabilities,
 )
 
 __all__ = [
@@ -41,5 +41,5 @@ __all__ = [
     'CoincidenceProcess',
     'generate_timetags',
     'LiveTimetagSimulator',
-    'coincidence_pairs_from_probabilities',
+    'coincidence_processes_from_probabilities',
 ]
