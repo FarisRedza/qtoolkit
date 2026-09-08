@@ -9,7 +9,7 @@ from .data import TimetagData
 
 
 @dataclasses.dataclass(frozen=True)
-class CoincidencePair:
+class CoincidenceProcess:
     channel_a: int
     channel_b: int
     rate_hz: float
@@ -32,7 +32,7 @@ def _validate_duration_s(duration_s: float) -> None:
 
 def _calculate_independent_rates(
     channel_rates: typing.Mapping[int, float],
-    coincidence_pairs: typing.Sequence[CoincidencePair],
+    coincidence_pairs: typing.Sequence[CoincidenceProcess],
 ) -> dict[int, float]:
     """
     Validate a simulation configuration and calculate independent singles rates.
@@ -203,7 +203,7 @@ def _combine_and_sort_events(
 
 def _generate_timetags(
     channel_rates: typing.Mapping[int, float],
-    coincidence_pairs: typing.Sequence[CoincidencePair],
+    coincidence_pairs: typing.Sequence[CoincidenceProcess],
     duration_s: float,
     rng: typing.Optional[np.random.Generator] = None,
 ) -> tuple[
@@ -308,7 +308,7 @@ def _generate_timetags(
 
 def generate_timetags(
     channel_rates: typing.Mapping[int, float],
-    coincidence_pairs: typing.Sequence[CoincidencePair],
+    coincidence_pairs: typing.Sequence[CoincidenceProcess],
     duration_s: float,
     rng: typing.Optional[np.random.Generator] = None,
 ) -> TimetagData:
@@ -379,7 +379,7 @@ class LiveTimetagSimulator:
     def __init__(
         self,
         channel_rates: typing.Mapping[int, float],
-        coincidence_pairs: typing.Sequence[CoincidencePair] = (),
+        coincidence_pairs: typing.Sequence[CoincidenceProcess] = (),
         rng: typing.Optional[np.random.Generator] = None,
         start_time_ps: int = 0,
     ) -> None:
@@ -452,7 +452,7 @@ class LiveTimetagSimulator:
     @property
     def coincidence_pairs(
         self,
-    ) -> tuple[CoincidencePair, ...]:
+    ) -> tuple[CoincidenceProcess, ...]:
         """Configured genuine coincidence processes."""
         return self._coincidence_pairs
 
@@ -602,7 +602,7 @@ class LiveTimetagSimulator:
 
     def set_coincidence_pairs(
         self,
-        coincidence_pairs: typing.Sequence[CoincidencePair],
+        coincidence_pairs: typing.Sequence[CoincidenceProcess],
     ) -> None:
         """
         Set the genuine coincidence processes.
@@ -970,7 +970,7 @@ def coincidence_pairs_from_probabilities(
     pair_rate_hz: float,
     delay_ps: int = 0,
     jitter_ps: float = 0.0,
-) -> list[CoincidencePair]:
+) -> list[CoincidenceProcess]:
     """
     Convert detector-pair probabilities into simulated coincidence processes.
     """
@@ -980,7 +980,7 @@ def coincidence_pairs_from_probabilities(
         )
 
     return [
-        CoincidencePair(
+        CoincidenceProcess(
             channel_a=channel_a,
             channel_b=channel_b,
             rate_hz=(

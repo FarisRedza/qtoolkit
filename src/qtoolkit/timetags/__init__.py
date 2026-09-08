@@ -18,7 +18,7 @@ from .data import (
 )
 
 from .simulation import (
-    CoincidencePair,
+    CoincidenceProcess,
     generate_timetags,
     LiveTimetagSimulator,
     coincidence_pairs_from_probabilities,
@@ -38,7 +38,7 @@ __all__ = [
     'TimetagData',
     'ProcessedTimetagData',
 
-    'CoincidencePair',
+    'CoincidenceProcess',
     'generate_timetags',
     'LiveTimetagSimulator',
     'coincidence_pairs_from_probabilities',
