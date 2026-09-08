@@ -5,6 +5,14 @@ import pathlib
 import numpy as np
 import numpy.typing as npt
 
+from ..qkd import BasisMetrics
+
+from .channels import (
+    ChannelPair,
+    BasisPairs,
+)
+from .coincidences import count_coincidences
+
 
 @dataclasses.dataclass(frozen=True)
 class TimetagData:
@@ -146,8 +154,7 @@ class ProcessedTimetagData:
             for pair in pairs
         )
         coincidences = count_coincidences(
-            timetags=timetag_data.timetags,
-            channels=timetag_data.channels,
+            data=timetag_data,
             pairs=pairs,
             coincidence_window=coincidence_window
         )
