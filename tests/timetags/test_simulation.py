@@ -1,11 +1,11 @@
 import numpy as np
 import pytest
 
-import qtoolkit
+from qtoolkit import timetags
 
 
 def test_generate_timetags(tmp_path) -> None:
-    data = qtoolkit.generate_timetags(
+    data = timetags.generate_timetags(
         channel_rates={
             0: 50_000,
             1: 45_000,
@@ -13,9 +13,11 @@ def test_generate_timetags(tmp_path) -> None:
             5: 48_000,
         },
         coincidence_pairs=[
-            qtoolkit.CoincidencePair(
-                channel_a=0,
-                channel_b=4,
+            timetags.CoincidenceProcess(
+                channels=timetags.ChannelPair(
+                    first=0,
+                    second=4,
+                ),
                 rate_hz=5_000,
                 delay_ps=300,
                 jitter_ps=50,
@@ -31,7 +33,7 @@ def test_generate_timetags(tmp_path) -> None:
     file_path = tmp_path.joinpath('timetags.txt')
     data.to_file(file_path)
 
-    loaded = qtoolkit.TimetagData.from_file(file_path)
+    loaded = timetags.TimetagData.from_file(file_path)
 
     np.testing.assert_array_equal(
         loaded.timetags,
@@ -47,7 +49,7 @@ def test_generate_timetags_zero_duration() -> None:
         ValueError,
         match='duration_s must be positive.',
     ):
-        data = qtoolkit.generate_timetags(
+        data = timetags.generate_timetags(
             channel_rates={
                 0: 50_000,
                 1: 45_000,
@@ -55,9 +57,11 @@ def test_generate_timetags_zero_duration() -> None:
                 5: 48_000,
             },
             coincidence_pairs=[
-                qtoolkit.CoincidencePair(
-                    channel_a=0,
-                    channel_b=4,
+                timetags.CoincidenceProcess(
+                    channels=timetags.ChannelPair(
+                        first=0,
+                        second=4,
+                    ),
                     rate_hz=5_000,
                     delay_ps=300,
                     jitter_ps=50,
@@ -72,7 +76,7 @@ def test_generate_timetags_negative_duration() -> None:
         ValueError,
         match='duration_s must be positive.',
     ):
-        data = qtoolkit.generate_timetags(
+        data = timetags.generate_timetags(
             channel_rates={
                 0: 50_000,
                 1: 45_000,
@@ -80,9 +84,11 @@ def test_generate_timetags_negative_duration() -> None:
                 5: 48_000,
             },
             coincidence_pairs=[
-                qtoolkit.CoincidencePair(
-                    channel_a=0,
-                    channel_b=4,
+                timetags.CoincidenceProcess(
+                    channels=timetags.ChannelPair(
+                        first=0,
+                        second=4,
+                    ),
                     rate_hz=5_000,
                     delay_ps=300,
                     jitter_ps=50,
@@ -93,7 +99,7 @@ def test_generate_timetags_negative_duration() -> None:
         )
 
 def test_generate_timetags_default_rng() -> None:
-    data = qtoolkit.generate_timetags(
+    data = timetags.generate_timetags(
         channel_rates={
             0: 50_000,
             1: 45_000,
@@ -101,9 +107,11 @@ def test_generate_timetags_default_rng() -> None:
             5: 48_000,
         },
         coincidence_pairs=[
-            qtoolkit.CoincidencePair(
-                channel_a=0,
-                channel_b=4,
+            timetags.CoincidenceProcess(
+                    channels=timetags.ChannelPair(
+                        first=0,
+                        second=4,
+                    ),
                 rate_hz=5_000,
                 delay_ps=300,
                 jitter_ps=50,
@@ -117,7 +125,7 @@ def test_generate_timetags_negative_channel_rate() -> None:
         ValueError,
         match='must be non-negative.',
     ):
-        data = qtoolkit.generate_timetags(
+        data = timetags.generate_timetags(
             channel_rates={
                 0: -50_000,
                 1: 45_000,
@@ -125,9 +133,11 @@ def test_generate_timetags_negative_channel_rate() -> None:
                 5: 48_000,
             },
             coincidence_pairs=[
-                qtoolkit.CoincidencePair(
-                    channel_a=0,
-                    channel_b=4,
+                timetags.CoincidenceProcess(
+                    channels=timetags.ChannelPair(
+                        first=0,
+                        second=4,
+                    ),
                     rate_hz=5_000,
                     delay_ps=300,
                     jitter_ps=50,
@@ -142,7 +152,7 @@ def test_generate_timetags_negative_coincidence_rate() -> None:
         ValueError,
         match='Coincidence rates must be non-negative.',
     ):
-        data = qtoolkit.generate_timetags(
+        data = timetags.generate_timetags(
             channel_rates={
                 0: 50_000,
                 1: 45_000,
@@ -150,9 +160,11 @@ def test_generate_timetags_negative_coincidence_rate() -> None:
                 5: 48_000,
             },
             coincidence_pairs=[
-                qtoolkit.CoincidencePair(
-                    channel_a=0,
-                    channel_b=4,
+                timetags.CoincidenceProcess(
+                    channels=timetags.ChannelPair(
+                        first=0,
+                        second=4,
+                    ),
                     rate_hz=-5_000,
                     delay_ps=300,
                     jitter_ps=50,
@@ -167,7 +179,7 @@ def test_generate_timetags_negative_jitter() -> None:
         ValueError,
         match='jitter_ps must be non-negative.',
     ):
-        data = qtoolkit.generate_timetags(
+        data = timetags.generate_timetags(
             channel_rates={
                 0: 50_000,
                 1: 45_000,
@@ -175,9 +187,11 @@ def test_generate_timetags_negative_jitter() -> None:
                 5: 48_000,
             },
             coincidence_pairs=[
-                qtoolkit.CoincidencePair(
-                    channel_a=0,
-                    channel_b=4,
+                timetags.CoincidenceProcess(
+                    channels=timetags.ChannelPair(
+                        first=0,
+                        second=4,
+                    ),
                     rate_hz=5_000,
                     delay_ps=300,
                     jitter_ps=-50,
@@ -209,12 +223,14 @@ def test_generate_timetags_no_singles_rate(
         ValueError,
         match='has no singles rate.',
     ):
-        data = qtoolkit.generate_timetags(
+        data = timetags.generate_timetags(
             channel_rates=channel_rates,
             coincidence_pairs=[
-                qtoolkit.CoincidencePair(
-                    channel_a=0,
-                    channel_b=4,
+                timetags.CoincidenceProcess(
+                    channels=timetags.ChannelPair(
+                        first=0,
+                        second=4,
+                    ),
                     rate_hz=5_000,
                     delay_ps=300,
                     jitter_ps=50,
@@ -231,7 +247,7 @@ def test_generate_timetags_cc_rate_greater_than_singles(
         ValueError,
         match='exceeds its singles rate',
     ):
-        data = qtoolkit.generate_timetags(
+        data = timetags.generate_timetags(
             channel_rates={
                 0: 4_000,
                 1: 45_000,
@@ -239,9 +255,11 @@ def test_generate_timetags_cc_rate_greater_than_singles(
                 5: 48_000,
             },
             coincidence_pairs=[
-                qtoolkit.CoincidencePair(
-                    channel_a=0,
-                    channel_b=4,
+                timetags.CoincidenceProcess(
+                    channels=timetags.ChannelPair(
+                        first=0,
+                        second=4,
+                    ),
                     rate_hz=5_000,
                     delay_ps=300,
                     jitter_ps=50,
@@ -257,7 +275,7 @@ def test_generate_timetags_cc_rate_greater_than_singles(
         file_path = tmp_path.joinpath('timetags.txt')
         data.to_file(file_path)
 
-        loaded = qtoolkit.TimetagData.from_file(file_path)
+        loaded = timetags.TimetagData.from_file(file_path)
 
         np.testing.assert_array_equal(
             loaded.timetags,
@@ -269,7 +287,7 @@ def test_generate_timetags_cc_rate_greater_than_singles(
         )
 
 def test_generate_timetags_no_timetags() -> None:
-    data = qtoolkit.generate_timetags(
+    data = timetags.generate_timetags(
         channel_rates={},
         coincidence_pairs=[],
         duration_s=1.0,
