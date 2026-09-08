@@ -14,7 +14,7 @@ from .coincidences import (
 
 from .data import (
     TimetagData,
-    # ProcessedTimetagData,
+    ProcessedTimetagData,
 )
 
 from .simulation import (
@@ -36,7 +36,7 @@ __all__ = [
     'count_coincidences',
 
     'TimetagData',
-    # 'ProcessedTimetagData',
+    'ProcessedTimetagData',
 
     'CoincidenceProcess',
     'generate_timetags',

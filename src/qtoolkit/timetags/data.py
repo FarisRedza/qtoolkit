@@ -5,13 +5,13 @@ import pathlib
 import numpy as np
 import numpy.typing as npt
 
-# from ..qkd.metrics import BasisMetrics
+from .channels import (
+    ChannelPair,
+    BasisPairs,
+)
 
-# from .channels import (
-#     ChannelPair,
-#     BasisPairs,
-# )
-# from .coincidences import count_coincidences
+if typing.TYPE_CHECKING:
+    from ..qkd.metrics import BasisMetrics
 
 
 @dataclasses.dataclass(frozen=True)
@@ -158,69 +158,71 @@ class TimetagData:
                 'timetags must be sorted in ascending order.'
             )
 
-# @dataclasses.dataclass(frozen=True)
-# class ProcessedTimetagData:
-#     coincidences: dict[tuple[int, int], int]
-#     coincidence_window: int
-#     file_path: typing.Optional[pathlib.Path] = None
+@dataclasses.dataclass(frozen=True)
+class ProcessedTimetagData:
+    coincidences: dict[tuple[int, int], int]
+    coincidence_window: int
+    file_path: typing.Optional[pathlib.Path] = None
 
-#     @classmethod
-#     def from_timetag_data(
-#             cls,
-#             timetag_data: TimetagData,
-#             pairs: typing.Iterable[
-#                 typing.Union[ChannelPair, tuple[int, int]]
-#             ],
-#             coincidence_window: int
-#     ) -> 'ProcessedTimetagData':
-#         pairs = tuple(
-#             pair.as_tuple()
-#             if isinstance(pair, ChannelPair)
-#             else pair
-#             for pair in pairs
-#         )
-#         coincidences = count_coincidences(
-#             data=timetag_data,
-#             pairs=pairs,
-#             coincidence_window=coincidence_window
-#         )
-#         return cls(
-#             coincidences=coincidences,
-#             coincidence_window=coincidence_window,
-#             file_path=timetag_data.file_path
-#         )
+    @classmethod
+    def from_timetag_data(
+            cls,
+            timetag_data: TimetagData,
+            pairs: typing.Iterable[
+                typing.Union[ChannelPair, tuple[int, int]]
+            ],
+            coincidence_window: int
+    ) -> 'ProcessedTimetagData':
+        from .coincidences import count_coincidences
 
-#     @classmethod
-#     def from_file(
-#             cls,
-#             file_path: typing.Union[pathlib.Path, str],
-#             pairs: list[ChannelPair],
-#             coincidence_window: int
-#     ) -> 'ProcessedTimetagData':
-#         timetag_data = TimetagData.from_file(file_path=file_path)
-#         return cls.from_timetag_data(
-#             timetag_data=timetag_data,
-#             pairs=pairs,
-#             coincidence_window=coincidence_window
-#         )
+        pairs = tuple(
+            pair.as_tuple()
+            if isinstance(pair, ChannelPair)
+            else pair
+            for pair in pairs
+        )
+        coincidences = count_coincidences(
+            data=timetag_data,
+            pairs=pairs,
+            coincidence_window=coincidence_window
+        )
+        return cls(
+            coincidences=coincidences,
+            coincidence_window=coincidence_window,
+            file_path=timetag_data.file_path
+        )
 
-#     def get_basis_metrics(
-#             self,
-#             pairs: BasisPairs,
-#     ) -> 'BasisMetrics':
-#         """
-#         Calculate metrics for a set of basis channel pairs.
+    @classmethod
+    def from_file(
+            cls,
+            file_path: typing.Union[pathlib.Path, str],
+            pairs: list[ChannelPair],
+            coincidence_window: int
+    ) -> 'ProcessedTimetagData':
+        timetag_data = TimetagData.from_file(file_path=file_path)
+        return cls.from_timetag_data(
+            timetag_data=timetag_data,
+            pairs=pairs,
+            coincidence_window=coincidence_window
+        )
 
-#         Parameters
-#         ----------
-#         pairs : BasisPairs
-#             Channel pairs corresponding to the outcomes 00, 01, 10, and 11.
+    def get_basis_metrics(
+            self,
+            pairs: BasisPairs,
+    ) -> 'BasisMetrics':
+        """
+        Calculate metrics for a set of basis channel pairs.
 
-#         Returns
-#         -------
-#         BasisMetrics
-#         """
-#         return BasisMetrics.from_coincidences(
-#             coincidences=self.coincidences,
-#             pairs=pairs,
-#         )
+        Parameters
+        ----------
+        pairs : BasisPairs
+            Channel pairs corresponding to the outcomes 00, 01, 10, and 11.
+
+        Returns
+        -------
+        BasisMetrics
+        """
+        return BasisMetrics.from_coincidences(
+            coincidences=self.coincidences,
+            pairs=pairs,
+        )

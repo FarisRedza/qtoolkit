@@ -4,8 +4,8 @@ import typing
 from ..timetags.channels import (
     ChannelPair,
     BasisPairs,
-    # ProcessedTimetagData,
 )
+from ..timetags.data import ProcessedTimetagData
 
 from ..polarisation.channels import PolarisationChannelMap
 
@@ -97,16 +97,16 @@ class BBM92Metrics:
     zz: BasisMetrics
     xx: BasisMetrics
 
-    # @classmethod
-    # def from_processed_data(
-    #         cls,
-    #         processed: ProcessedTimetagData,
-    #         channel_map: BBM92ChannelMap,
-    # ) -> 'BBM92Metrics':
-    #     return cls(
-    #         zz=processed.get_basis_metrics(channel_map.zz_pairs),
-    #         xx=processed.get_basis_metrics(channel_map.xx_pairs),
-    #     )
+    @classmethod
+    def from_processed_data(
+            cls,
+            processed: ProcessedTimetagData,
+            channel_map: BBM92ChannelMap,
+    ) -> 'BBM92Metrics':
+        return cls(
+            zz=processed.get_basis_metrics(channel_map.zz_pairs),
+            xx=processed.get_basis_metrics(channel_map.xx_pairs),
+        )
 
     @property
     def fidelity(self) -> float:
