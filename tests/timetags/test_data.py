@@ -41,10 +41,10 @@ def test_timetag_data_length(
     assert len(timetag_data) == 6
 
 
-def test_timetag_data_duration(
+def test_timetag_data_span(
         timetag_data: qtoolkit.timetags.TimetagData,
 ) -> None:
-    assert timetag_data.duration_ps == 2050
+    assert timetag_data.span_ps == 2050
 
 
 @pytest.mark.parametrize(
@@ -54,7 +54,7 @@ def test_timetag_data_duration(
         1,
     ],
 )
-def test_timetag_data_short_duration_is_zero(
+def test_timetag_data_short_span_is_zero(
         number_of_timetags: int,
 ) -> None:
     data = qtoolkit.timetags.TimetagData(
@@ -68,7 +68,7 @@ def test_timetag_data_short_duration_is_zero(
         ),
     )
 
-    assert data.duration_ps == 0
+    assert data.span_ps == 0
 
 
 def test_timetag_data_get_channel_timetags(
