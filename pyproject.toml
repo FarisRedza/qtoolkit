@@ -1,11 +1,13 @@
 [build-system]
-requires = ['setuptools>=44.0.0', 'wheel']
+requires = ['setuptools>=77.0.3', 'wheel']
 build-backend = 'setuptools.build_meta'
 
 [project]
 name = 'qtoolkit'
 version = '0.1.0'
 requires-python = '>=3.9'
+license = 'MIT'
+license-files = ['LICENCE']
 authors = [
     {name = 'Faris Redza', email = 'faris.redza1999@gmail.com'}
 ]
