@@ -4,7 +4,7 @@ API
 .. toctree::
     :maxdepth: 2
 
-    timetagging
-    lab
-    quantum_functions
+    polarisation/index
+    qkd/index
+    timetags/index
     misc_functions
