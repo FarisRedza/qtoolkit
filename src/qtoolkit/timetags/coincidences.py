@@ -4,6 +4,8 @@ import numpy as np
 import numpy.typing as npt
 import numba
 
+from .data import TimetagData
+
 
 @numba.njit(cache=True)
 def _count_twofold_coincidences(
@@ -307,7 +309,7 @@ def count_fourfold_coincidences(
         coincidence_window=coincidence_window
     )
 
-def count_coincidences(
+def _count_coincidences(
     timetags: npt.ArrayLike,
     channels: npt.ArrayLike,
     pairs: typing.Iterable[tuple[int, int]],
@@ -371,5 +373,39 @@ def count_coincidences(
                 coincidence_window=coincidence_window,
             )
         )
+
+    return coincidences
+
+def count_coincidences(
+    data: TimetagData,
+    pairs: typing.Iterable[tuple[int, int]],
+    coincidence_window: int,
+) -> dict[tuple[int, int], int]:
+    """
+    Counts twofold coincidences for selected channel pairs.
+
+    Parameters
+    ----------
+    data: TimetagData
+        Timetag data.
+
+    pairs: list[tuple[int, int]]
+        Channel pairs for which coincidences should be calculated.
+
+    coincidence_window: int
+        Maximum separation between coincident timetags (ps).
+
+    Returns
+    -------
+    dict
+        Mapping ``(channel_a, channel_b)`` to coincidence count.
+    """
+
+    coincidences = _count_coincidences(
+        timetags=data.timetags,
+        channels=data.channels,
+        pairs=pairs,
+        coincidence_window=coincidence_window
+    )
 
     return coincidences
