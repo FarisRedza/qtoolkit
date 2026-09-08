@@ -222,6 +222,8 @@ class ProcessedTimetagData:
         -------
         BasisMetrics
         """
+        from ..qkd.metrics import BasisMetrics
+
         return BasisMetrics.from_coincidences(
             coincidences=self.coincidences,
             pairs=pairs,
