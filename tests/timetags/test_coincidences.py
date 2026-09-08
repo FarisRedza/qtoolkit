@@ -336,12 +336,10 @@ def test_count_coincidences_rejects_non_1d_timetags() -> None:
         ValueError,
         match='Timetags must be a 1D array',
     ):
-        timetags.count_coincidences(
-            data=timetags.TimetagData(
-                timetags=np.array([1000, 2000]),
-                channels=np.array([0, 1])
-            ),
-            pairs=[timetags.ChannelPair(0, 1)],
+        timetags.coincidences._count_coincidences(
+            timetags=[[1000, 2000]],
+            channels=[0, 1],
+            pairs=[(0, 1)],
             coincidence_window=100,
         )
 
@@ -351,12 +349,10 @@ def test_count_coincidences_rejects_non_1d_channels() -> None:
         ValueError,
         match='Channels must be a 1D array',
     ):
-        timetags.count_coincidences(
-            data=timetags.TimetagData(
-                timetags=np.array([1000, 2000]),
-                channels=np.array([0, 1])
-            ),
-            pairs=[timetags.ChannelPair(0, 1)],
+        timetags.coincidences._count_coincidences(
+            timetags=[1000, 2000],
+            channels=[[0, 1]],
+            pairs=[(0, 1)],
             coincidence_window=100,
         )
 
