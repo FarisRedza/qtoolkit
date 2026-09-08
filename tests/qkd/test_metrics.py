@@ -21,7 +21,7 @@ def test_qber(
         expected: float,
 ) -> None:
     assert (
-        qtoolkit.qber(
+        qtoolkit.qkd.qber(
             correct=correct,
             incorrect=incorrect,
         )
@@ -30,7 +30,7 @@ def test_qber(
 
 
 def test_qber_from_coincidences_correlated() -> None:
-    result = qtoolkit.qber_from_coincidences(
+    result = qtoolkit.qkd.qber_from_coincidences(
         c_00=450,
         c_01=25,
         c_10=25,
@@ -41,7 +41,7 @@ def test_qber_from_coincidences_correlated() -> None:
 
 
 def test_qber_from_coincidences_anticorrelated() -> None:
-    result = qtoolkit.qber_from_coincidences(
+    result = qtoolkit.qkd.qber_from_coincidences(
         c_00=25,
         c_01=450,
         c_10=500,
@@ -53,7 +53,7 @@ def test_qber_from_coincidences_anticorrelated() -> None:
 
 
 def test_qz_correlated() -> None:
-    result = qtoolkit.qz(
+    result = qtoolkit.qkd.qz(
         c_hh=450,
         c_hv=25,
         c_vh=25,
@@ -64,7 +64,7 @@ def test_qz_correlated() -> None:
 
 
 def test_qz_anticorrelated() -> None:
-    result = qtoolkit.qz(
+    result = qtoolkit.qkd.qz(
         c_hh=25,
         c_hv=450,
         c_vh=500,
@@ -76,7 +76,7 @@ def test_qz_anticorrelated() -> None:
 
 
 def test_qx_correlated() -> None:
-    result = qtoolkit.qx(
+    result = qtoolkit.qkd.qx(
         c_dd=450,
         c_da=25,
         c_ad=25,
@@ -87,7 +87,7 @@ def test_qx_correlated() -> None:
 
 
 def test_qx_anticorrelated() -> None:
-    result = qtoolkit.qx(
+    result = qtoolkit.qkd.qx(
         c_dd=25,
         c_da=450,
         c_ad=500,
@@ -99,7 +99,7 @@ def test_qx_anticorrelated() -> None:
 
 
 def test_qy_correlated() -> None:
-    result = qtoolkit.qy(
+    result = qtoolkit.qkd.qy(
         c_rr=450,
         c_rl=25,
         c_lr=25,
@@ -110,7 +110,7 @@ def test_qy_correlated() -> None:
 
 
 def test_qy_anticorrelated() -> None:
-    result = qtoolkit.qy(
+    result = qtoolkit.qkd.qy(
         c_rr=25,
         c_rl=450,
         c_lr=500,
@@ -136,7 +136,7 @@ def test_qber_from_visibility(
         expected: float,
 ) -> None:
     assert (
-        qtoolkit.qber_from_visibility(visibility)
+        qtoolkit.qkd.qber_from_visibility(visibility)
         == pytest.approx(expected)
     )
 
@@ -156,7 +156,7 @@ def test_visibility(
         expected: float,
 ) -> None:
     assert (
-        qtoolkit.visibility(
+        qtoolkit.qkd.visibility(
             max=maximum,
             min=minimum,
         )
@@ -178,7 +178,7 @@ def test_visibility_from_qber(
         expected: float,
 ) -> None:
     assert (
-        qtoolkit.visibility_from_qber(qber)
+        qtoolkit.qkd.visibility_from_qber(qber)
         == pytest.approx(expected)
     )
 
@@ -196,15 +196,15 @@ def test_visibility_from_qber(
 def test_qber_visibility_round_trip(
         qber: float,
 ) -> None:
-    visibility = qtoolkit.visibility_from_qber(qber)
-    result = qtoolkit.qber_from_visibility(visibility)
+    visibility = qtoolkit.qkd.visibility_from_qber(qber)
+    result = qtoolkit.qkd.qber_from_visibility(visibility)
 
     assert result == pytest.approx(qber)
 
 # heralding
 
 def test_symmetric_heralding_efficiency() -> None:
-    result = qtoolkit.symmetric_heralding_efficiency(
+    result = qtoolkit.qkd.symmetric_heralding_efficiency(
         coincidences=500,
         singles_a=1000,
         singles_b=1000,
@@ -215,7 +215,7 @@ def test_symmetric_heralding_efficiency() -> None:
 # fidelity
 
 def test_fidelity_from_two_visibilities() -> None:
-    result = qtoolkit.fidelity_from_visibility(
+    result = qtoolkit.qkd.fidelity_from_visibility(
         visibility_z=0.9,
         visibility_x=0.8,
     )
@@ -224,7 +224,7 @@ def test_fidelity_from_two_visibilities() -> None:
 
 
 def test_fidelity_from_three_visibilities() -> None:
-    result = qtoolkit.fidelity_from_visibility(
+    result = qtoolkit.qkd.fidelity_from_visibility(
         visibility_z=0.9,
         visibility_x=0.8,
         visibility_y=0.7,
@@ -234,7 +234,7 @@ def test_fidelity_from_three_visibilities() -> None:
 
 
 def test_fidelity_from_qber() -> None:
-    result = qtoolkit.fidelity_from_qber(
+    result = qtoolkit.qkd.fidelity_from_qber(
         qx=0.05,
         qz=0.10,
     )
@@ -246,14 +246,14 @@ def test_fidelity_qber_visibility_equivalence() -> None:
     qx = 0.05
     qz = 0.10
 
-    from_qber = qtoolkit.fidelity_from_qber(
+    from_qber = qtoolkit.qkd.fidelity_from_qber(
         qx=qx,
         qz=qz,
     )
 
-    from_visibility = qtoolkit.fidelity_from_visibility(
-        visibility_x=qtoolkit.visibility_from_qber(qx),
-        visibility_z=qtoolkit.visibility_from_qber(qz),
+    from_visibility = qtoolkit.qkd.fidelity_from_visibility(
+        visibility_x=qtoolkit.qkd.visibility_from_qber(qx),
+        visibility_z=qtoolkit.qkd.visibility_from_qber(qz),
     )
 
     assert from_qber == pytest.approx(from_visibility)
@@ -267,7 +267,7 @@ def test_purity_pure_state() -> None:
     ])
 
     assert (
-        qtoolkit.purity(density_matrix)
+        qtoolkit.qkd.purity(density_matrix)
         == pytest.approx(1.0)
     )
 
@@ -279,7 +279,7 @@ def test_purity_maximally_mixed_state() -> None:
     ])
 
     assert (
-        qtoolkit.purity(density_matrix)
+        qtoolkit.qkd.purity(density_matrix)
         == pytest.approx(0.5)
     )
 
@@ -291,7 +291,7 @@ def test_purity_complex_pure_state() -> None:
     ])
 
     assert (
-        qtoolkit.purity(density_matrix)
+        qtoolkit.qkd.purity(density_matrix)
         == pytest.approx(1.0)
     )
 
@@ -313,4 +313,121 @@ def test_purity_requires_square_matrix(
         ValueError,
         match='Density matrix must be square',
     ):
-        qtoolkit.purity(density_matrix)
+        qtoolkit.qkd.purity(density_matrix)
+
+# BasisMetrics
+
+def test_basis_metrics_from_coincidences() -> None:
+    pairs = (
+        qtoolkit.timetags.ChannelPair(0, 4),
+        qtoolkit.timetags.ChannelPair(0, 5),
+        qtoolkit.timetags.ChannelPair(1, 4),
+        qtoolkit.timetags.ChannelPair(1, 5),
+    )
+
+    coincidences = {
+        (0, 4): 450,
+        (0, 5): 25,
+        (1, 4): 25,
+        (1, 5): 500,
+    }
+
+    result = qtoolkit.qkd.BasisMetrics.from_coincidences(
+        coincidences=coincidences,
+        pairs=pairs,
+    )
+
+    assert result == qtoolkit.qkd.BasisMetrics(
+        c_00=450,
+        c_01=25,
+        c_10=25,
+        c_11=500,
+    )
+
+
+def test_basis_metrics_counts() -> None:
+    metrics = qtoolkit.qkd.BasisMetrics(
+        c_00=450,
+        c_01=25,
+        c_10=25,
+        c_11=500,
+    )
+
+    assert metrics.odd == 50
+    assert metrics.even == 950
+    assert metrics.total == 1000
+
+
+def test_basis_metrics_probabilities() -> None:
+    metrics = qtoolkit.qkd.BasisMetrics(
+        c_00=450,
+        c_01=25,
+        c_10=25,
+        c_11=500,
+    )
+
+    assert (
+        metrics.even_probability
+        == pytest.approx(0.95)
+    )
+
+    assert (
+        metrics.odd_probability
+        == pytest.approx(0.05)
+    )
+
+
+def test_basis_metrics_empty_probabilities() -> None:
+    metrics = qtoolkit.qkd.BasisMetrics(
+        c_00=0,
+        c_01=0,
+        c_10=0,
+        c_11=0,
+    )
+
+    assert np.isnan(metrics.even_probability)
+    assert np.isnan(metrics.odd_probability)
+
+
+def test_basis_metrics_qber() -> None:
+    metrics = qtoolkit.qkd.BasisMetrics(
+        c_00=450,
+        c_01=25,
+        c_10=25,
+        c_11=500,
+    )
+
+    assert metrics.qber == pytest.approx(0.05)
+
+
+def test_basis_metrics_visibility() -> None:
+    metrics = qtoolkit.qkd.BasisMetrics(
+        c_00=450,
+        c_01=25,
+        c_10=25,
+        c_11=500,
+    )
+
+    assert metrics.visibility == pytest.approx(0.9)
+
+
+def test_basis_metrics_as_row() -> None:
+    metrics = qtoolkit.qkd.BasisMetrics(
+        c_00=450,
+        c_01=25,
+        c_10=25,
+        c_11=500,
+    )
+
+    assert metrics.as_row() == pytest.approx([
+        450,
+        25,
+        25,
+        500,
+        50,
+        950,
+        1000,
+        0.95,
+        0.05,
+        0.9,
+    ])
