@@ -1,5 +1,6 @@
 import typing
 import dataclasses
+import warnings
 
 import numpy as np
 import numpy.typing as npt
@@ -32,7 +33,14 @@ def qber(
     >>> qber(correct=950, incorrect=50)
     0.05
     """
-    return incorrect / (incorrect + correct)
+    denominator = incorrect + correct
+    if denominator == 0:
+        warnings.warn('Warning: Division by zero. Returing 0')
+        return 0
+
+    return incorrect / denominator
+
+    
 
 def qber_from_coincidences(
         c_00: float,
