@@ -621,6 +621,30 @@ class LiveTimetagSimulator:
         self._coincidence_pairs = coincidence_pairs
         self._independent_rates = independent_rates
 
+    def set_rates(
+        self,
+        channel_rates: typing.Mapping[int, float],
+        coincidence_processes: typing.Sequence[
+            CoincidenceProcess
+        ],
+    ) -> None:
+        channel_rates = dict(
+            channel_rates
+        )
+
+        coincidence_processes = tuple(
+            coincidence_processes
+        )
+
+        independent_rates = _calculate_independent_rates(
+            channel_rates=channel_rates,
+            coincidence_processes=coincidence_processes,
+        )
+
+        self._channel_rates = channel_rates
+        self._coincidence_pairs = coincidence_processes
+        self._independent_rates = independent_rates
+
     @staticmethod
     def _split_current_and_future(
         timetags: npt.NDArray[np.int64],
