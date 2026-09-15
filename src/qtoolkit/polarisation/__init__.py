@@ -10,9 +10,9 @@ from .measurement import (
 )
 
 from .optics import (
-    WavePlate,
-    QuarterWavePlate,
-    HalfWavePlate,
+    Waveplate,
+    QuarterWaveplate,
+    HalfWaveplate,
     compose_waveplates,
 )
 
@@ -33,9 +33,9 @@ __all__ = [
     'BB84Measurement',
     'BB84MeasurementPair',
 
-    'WavePlate',
-    'QuarterWavePlate',
-    'HalfWavePlate',
+    'Waveplate',
+    'QuarterWaveplate',
+    'HalfWaveplate',
     'compose_waveplates',
 
     'PolarisationState',

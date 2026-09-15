@@ -4,7 +4,7 @@ import numpy as np
 
 
 @dataclasses.dataclass
-class WavePlate:
+class Waveplate:
     retardance_rad: float
     angle_deg: float = 0.0
 
@@ -64,7 +64,7 @@ class WavePlate:
         return self.matrix @ state
 
 
-class QuarterWavePlate(WavePlate):
+class QuarterWaveplate(Waveplate):
     def __init__(
         self,
         angle_deg: float = 0.0,
@@ -75,7 +75,7 @@ class QuarterWavePlate(WavePlate):
         )
 
 
-class HalfWavePlate(WavePlate):
+class HalfWaveplate(Waveplate):
     def __init__(
         self,
         angle_deg: float = 0.0,
@@ -87,7 +87,7 @@ class HalfWavePlate(WavePlate):
 
 
 def compose_waveplates(
-    waveplates: list[WavePlate],
+    waveplates: list[Waveplate],
 ) -> np.ndarray:
     """Compose a sequence of waveplates into a single Jones matrix."""
     result = np.eye(2, dtype=complex)
