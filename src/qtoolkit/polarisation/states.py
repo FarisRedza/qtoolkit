@@ -1,3 +1,5 @@
+import typing
+
 import numpy as np
 import numpy.typing as npt
 
@@ -89,22 +91,21 @@ def apply_jones_matrix(
 def apply_local_jones_matrix(
     state: npt.ArrayLike,
     matrix: npt.ArrayLike,
-    subsystem: int,
+    subsystem: typing.Literal[0,1],
 ) -> PolarisationState:
     """
-    Apply a Jones matrix to one photon of a two-photon state.
+    Apply a Jones matrix to one subsystem of a two-photon polarisation state.
 
-    Parameters
-    ----------
-    state:
-        Two-photon state in the basis
-        |HH>, |HV>, |VH>, |VV>.
+    For a two-photon state :math:`|\\psi\\rangle`, a Jones matrix
+    :math:`J` acting locally on subsystem :math:`i` transforms the state as
 
-    matrix:
-        2x2 Jones matrix.
+    .. math::
 
-    subsystem:
-        Photon to transform: 0 or 1.
+        |\\psi'\\rangle =
+        \\begin{cases}
+            (J \\otimes I)|\\psi\\rangle, & i = 0, \\\\
+            (I \\otimes J)|\\psi\\rangle, & i = 1.
+        \\end{cases}
     """
     state_array = np.asarray(
         state,
