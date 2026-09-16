@@ -17,6 +17,8 @@ from .metrics import (
     BasisMetrics,
 )
 
+from . import cw
+
 __all__ = [
     'BBM92ChannelMap',
     'BBM92Metrics',
@@ -32,4 +34,6 @@ __all__ = [
     'fidelity_from_qber',
     'purity',
     'BasisMetrics',
+
+    'cw'
 ]
