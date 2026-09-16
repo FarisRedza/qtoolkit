@@ -1,32 +1,53 @@
-import numpy as np
+import typing
 
-def binary_entropy(p: float) -> float:
+import numpy as np
+import numpy.typing as npt
+
+def binary_entropy(
+    p: typing.Union[float, npt.ArrayLike],
+) -> typing.Union[float, npt.NDArray[np.float64]]:
     """
     Calculate the binary entropy, which quantifies the uncertainty associated
-    with a binary outcome with probability (p).
+    with a binary outcome with probability :math:`p`.
 
     .. math::
-        \\text{H}(X) = -p\\log_2(p) - (1-p)\\log_2(1-p)
+        \\text{H}_2(p) = -p\\log_2(p) - (1-p)\\log_2(1-p)
 
     Parameters
     ----------
-    p: float
-        Probability of one of the two outcomes, in the range [0, 1]
-    
+    p : float or array-like
+        Probability of one of the two outcomes, in the range [0, 1].
+
     Returns
     -------
-    float
+    float or numpy.ndarray
+        Binary entropy of ``p``.
     """
-    if not 0 <= p <= 1:
-        raise ValueError('p must be between 0 and 1.')
+    p = np.asarray(p, dtype=float)
 
-    if p in (0, 1):
-        return 0.0
+    if np.any((p < 0) | (p > 1)):
+        raise ValueError("p must be between 0 and 1.")
 
-    return -p * np.log2(p) - (1-p) * np.log2(1-p)
+    result = np.zeros_like(p)
+    mask = (p > 0) & (p < 1)
 
-def fraction_to_dB(x: float) -> float:
-    return -10 * np.log10(x)
+    result[mask] = (
+        -p[mask] * np.log2(p[mask])
+        - (1 - p[mask]) * np.log2(1 - p[mask])
+    )
 
-def dB_to_fraction(x: float) -> float:
-    return 10**(-x/10)
+    return result.item() if result.ndim == 0 else result
+
+def fraction_to_dB(
+        x: typing.Union[float, npt.ArrayLike]
+    ) -> typing.Union[float, npt.NDArray[np.float64]]:
+    """Convert a linear fraction to loss in dB."""
+    result = -10 * np.log10(x)
+    return result.item() if np.ndim(result) == 0 else result
+
+def dB_to_fraction(
+        x: typing.Union[float, npt.ArrayLike]
+    ) -> typing.Union[float, npt.NDArray[np.float64]]:
+    """Convert loss in dB to a linear fraction."""
+    result = np.power(10.0, -np.asarray(x) / 10)
+    return result.item() if np.ndim(result) == 0 else result
