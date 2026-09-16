@@ -258,3 +258,30 @@ def secure_key_rate_symmetric(
         R^\\text{s} = \\frac{1}{2} \\text{CC}^\\text{m} \\left[1 - 2.1 \\text{H}_2(E)\\right]
     """
     return 0.5 * measured_coincidence_rate * (1 - 2.1 * binary_entropy(qber))
+
+def brightness(
+        true_single_rate_a: float,
+        true_single_rate_b: float,
+        true_coincidence_rate: float
+) -> float:
+    """
+    Equation A1
+
+    .. math::
+        B = \\frac{S_\\text{A}^\\text{t} S_\\text{B}^\\text{t}}{\\text{CC}^\\text{t}}
+    """
+    return true_single_rate_a * true_single_rate_b / true_coincidence_rate
+
+def detector_dead_time_efficiency(
+        brightness: float,
+        efficiency: float,
+        dead_time: float,
+        number_of_detectors: int
+) -> float:
+    """
+    Equation B1
+
+    .. math::
+        \\eta_i^{t_\\dagger} = \\frac{1}{1 + B \\eta_i t_\\dagger / d}
+    """
+    return 1 / (1 + brightness*efficiency*dead_time/number_of_detectors)
