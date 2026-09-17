@@ -83,7 +83,7 @@ def measured_single_rate(
     return true_singles_rate + dark_count_rate
 
 def mean_clicks(
-        measured_single_rate: float,
+        measured_singles_rate: float,
         coincidence_window: float
 ) -> float:
     """
@@ -92,7 +92,7 @@ def mean_clicks(
     .. math::
         \\mu_\\text{A}^S = S_\\text{A}^\\text{m} t_\\text{CC}
     """
-    return measured_single_rate * coincidence_window
+    return measured_singles_rate * coincidence_window
 
 def accidental_probability(
         mean_clicks_a: float,

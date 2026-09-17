@@ -95,7 +95,7 @@ def test_measured_single_rate() -> None:
 
 def test_mean_clicks() -> None:
     assert cw.mean_clicks(
-        measured_single_rate=100_000,
+        measured_singles_rate=100_000,
         coincidence_window=1e-9,
     ) == pytest.approx(1e-4)
 
