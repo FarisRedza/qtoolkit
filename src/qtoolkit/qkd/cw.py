@@ -285,3 +285,25 @@ def detector_dead_time_efficiency(
         \\eta_i^{t_\\dagger} = \\frac{1}{1 + B \\eta_i t_\\dagger / d}
     """
     return 1 / (1 + brightness*efficiency*dead_time/number_of_detectors)
+
+def accidental_coincidence_rate_deadtime_corrected(
+        coincidence_window: float,
+        measured_singles_a: float,
+        measured_singles_b: float,
+        dead_time_efficiency_a: float,
+        dead_time_efficiency_b: float
+) -> float:
+    """
+    Equation B2
+
+    .. math::
+        \\text{CC}_{t_\\dagger}^{\\text{acc}} \\approx \\frac{S_\\text{A}^\\text{m} S_\\text{B}^\\text{m} t_\\text{CC}}{\\eta^{t_\\dagger}_\\text{A} \\eta^{t_\\dagger}_\\text{B}}
+    """
+    return (
+        measured_singles_a *
+        measured_singles_b *
+        coincidence_window
+    ) / (
+        dead_time_efficiency_a * 
+        dead_time_efficiency_b
+    )
