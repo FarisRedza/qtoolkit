@@ -85,6 +85,7 @@ class CoincidenceCounts:
 
     @classmethod
     def from_dataruns(cls, dataruns: list[Datarun]) -> 'CoincidenceCounts':
+        """Get the average values from a list of Datarun objects."""
         acquisition_time = sum(d.acquisition_time_s for d in dataruns)
         return cls(
             **{
@@ -359,8 +360,7 @@ def plot_data(
                 bit_error_rate=qber,
                 phase_error_rate=qx,
                 sifting_probability=0.5,
-                # Historical analysis omitted the f=1.1 correction.
-                error_correction_efficiency=1.0,
+                error_correction_efficiency=1.1,
             )
         )
 
