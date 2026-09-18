@@ -2,6 +2,7 @@ Guides
 ======
 
 .. toctree::
-    :maxdepth: 3
+   :maxdepth: 2
+   :caption: Contents:
 
-    test
+   examples/index
