@@ -52,7 +52,7 @@ entanglement-based QKD systems, investigating secure key rates, modelling the
 effects of channel loss and detector timing, and simulating polarisation
 measurements and waveplate rotations.
 
-See the :doc:`guides/examples` page for complete examples with source code.
+See the :doc:`guides/examples/index` page for complete examples with source code.
 
 Documentation
 -------------
