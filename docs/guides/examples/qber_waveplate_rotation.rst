@@ -23,6 +23,11 @@ This example demonstrates how changes to optical components can be propagated
 from a quantum-state model through to simulated timetag measurements and QKD
 metrics.
 
+.. image:: ../../../examples/qber_waveplate_rotation.png
+   :alt: QBER in the Z and X bases as the simulated waveplates are rotated
+   :align: center
+   :width: 80%
+
 .. literalinclude:: ../../../examples/qber_waveplate_rotation.py
    :language: python
    :linenos:

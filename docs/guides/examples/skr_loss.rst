@@ -14,6 +14,12 @@ to calculate the QBER, phase-basis error rate, and secure key rate from the
 measured coincidence counts, allowing the measured data and model to be
 displayed together.
 
+.. image:: ../../../examples/skr_loss.png
+   :alt: Secure key rate as a function of channel loss
+   :align: center
+   :width: 80%
+
+
 .. literalinclude:: ../../../examples/skr_loss.py
    :language: python
    :linenos:

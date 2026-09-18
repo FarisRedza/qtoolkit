@@ -11,6 +11,11 @@ key rate. This optimisation is repeated for several timing imprecisions.
 The resulting curves show how improved timing resolution allows useful key
 rates to be maintained at greater channel losses.
 
+.. image:: ../../../examples/skr_loss_timing.png
+   :alt: Secure key rate for different detector timing imprecisions
+   :align: center
+   :width: 80%
+
 .. literalinclude:: ../../../examples/skr_loss_timing.py
    :language: python
    :linenos:
