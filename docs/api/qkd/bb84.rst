@@ -1,7 +1,9 @@
 BB84
 ====
 
-BB84
+Tools specific to the BB84 quantum key distribution protocol, providing
+convenient representations and calculations for working with BB84
+measurements and experimental data.
 
 .. automodule:: qtoolkit.qkd.bb84
    :members:
