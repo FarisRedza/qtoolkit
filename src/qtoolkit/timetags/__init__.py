@@ -1,3 +1,9 @@
+"""Tools for processing and simulating timetag data.
+
+This subpackage provides data structures for timetags, coincidence-counting
+functions, channel utilities, and tools for generating simulated timetag data.
+"""
+
 from .channels import (
     ChannelPair,
     BasisPairs,

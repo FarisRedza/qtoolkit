@@ -1,6 +1,8 @@
 QKD
 ===
 
+.. automodule:: qtoolkit.qkd
+
 .. toctree::
     :maxdepth: 2
 

@@ -1,6 +1,8 @@
 Timetags
 ========
 
+.. automodule:: qtoolkit.timetags
+
 .. toctree::
     :maxdepth: 2
 

@@ -1,3 +1,9 @@
+"""Tools for quantum key distribution experiments and simulations.
+
+This subpackage provides common QKD metrics, protocol-specific utilities,
+and analytical models for quantum key distribution systems.
+"""
+
 from .bbm92 import (
     BBM92ChannelMap,
     BBM92Metrics,

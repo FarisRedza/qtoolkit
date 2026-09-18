@@ -1,6 +1,8 @@
 Polarisation
 ============
 
+.. automodule:: qtoolkit.polarisation
+
 .. toctree::
     :maxdepth: 2
 

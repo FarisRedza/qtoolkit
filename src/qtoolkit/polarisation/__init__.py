@@ -1,3 +1,9 @@
+"""Tools for modelling polarisation states, measurements, and optical components.
+
+This subpackage provides common polarisation states, Jones-matrix
+representations of optical components, and models of polarisation measurements.
+"""
+
 from .channels import (
     PolarisationChannelMap,
 )
