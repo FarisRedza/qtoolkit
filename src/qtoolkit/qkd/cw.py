@@ -10,7 +10,7 @@ from ..misc_functions import binary_entropy
 
 # idealised cw-qkd
 
-def true_single_rate(
+def true_singles_rate(
         brightness: float,
         efficiency: float
 ) -> float:
@@ -37,7 +37,7 @@ def true_coincidence_rate(
 
 def heralding_efficiency(
         coincidence_rate: float,
-        single_rate: float
+        singles_rate: float
 ) -> float:
     r"""
     Equation 4
@@ -45,7 +45,7 @@ def heralding_efficiency(
     .. math::
         \eta_\text{A} = \frac{\text{CC}^\text{t}}{S_\text{B}^\text{{t}}}
     """
-    return coincidence_rate / single_rate
+    return coincidence_rate / singles_rate
 
 def total_heralding_efficiency(
         heralding_efficiency_a: float,
@@ -71,7 +71,7 @@ def total_polarisation_error(
 
 # noise-afflicted cw-qkd
 
-def measured_single_rate(
+def measured_singles_rate(
         true_singles_rate: float,
         dark_count_rate: float
 ) -> float:
@@ -261,8 +261,8 @@ def secure_key_rate_symmetric(
     return 0.5 * measured_coincidence_rate * (1 - 2.1 * binary_entropy(qber))
 
 def brightness(
-        true_single_rate_a: float,
-        true_single_rate_b: float,
+        true_singles_rate_a: float,
+        true_singles_rate_b: float,
         true_coincidence_rate: float
 ) -> float:
     r"""
@@ -271,7 +271,7 @@ def brightness(
     .. math::
         B = \frac{S_\text{A}^\text{t} S_\text{B}^\text{t}}{\text{CC}^\text{t}}
     """
-    return true_single_rate_a * true_single_rate_b / true_coincidence_rate
+    return true_singles_rate_a * true_singles_rate_b / true_coincidence_rate
 
 def detector_dead_time_efficiency(
         brightness: float,

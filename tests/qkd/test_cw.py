@@ -7,7 +7,7 @@ from qtoolkit.qkd import cw
 
 
 def test_true_single_rate() -> None:
-    assert cw.true_single_rate(
+    assert cw.true_singles_rate(
         brightness=1_000_000,
         efficiency=0.2,
     ) == pytest.approx(200_000)
@@ -26,12 +26,12 @@ def test_heralding_efficiency() -> None:
     efficiency_a = 0.2
     efficiency_b = 0.3
 
-    singles_a = cw.true_single_rate(
+    singles_a = cw.true_singles_rate(
         brightness,
         efficiency_a,
     )
 
-    singles_b = cw.true_single_rate(
+    singles_b = cw.true_singles_rate(
         brightness,
         efficiency_b,
     )
@@ -87,7 +87,7 @@ def test_total_polarisation_error(
 
 
 def test_measured_single_rate() -> None:
-    assert cw.measured_single_rate(
+    assert cw.measured_singles_rate(
         true_singles_rate=100_000,
         dark_count_rate=250,
     ) == pytest.approx(100_250)
@@ -434,22 +434,22 @@ def test_coincidence_scaling_with_brightness() -> None:
         efficiency_b=efficiency_b,
     )
 
-    singles_a_1 = cw.true_single_rate(
+    singles_a_1 = cw.true_singles_rate(
         brightness=brightness_1,
         efficiency=efficiency_a,
     )
 
-    singles_b_1 = cw.true_single_rate(
+    singles_b_1 = cw.true_singles_rate(
         brightness=brightness_1,
         efficiency=efficiency_b,
     )
 
-    singles_a_2 = cw.true_single_rate(
+    singles_a_2 = cw.true_singles_rate(
         brightness=brightness_2,
         efficiency=efficiency_a,
     )
 
-    singles_b_2 = cw.true_single_rate(
+    singles_b_2 = cw.true_singles_rate(
         brightness=brightness_2,
         efficiency=efficiency_b,
     )

@@ -192,15 +192,15 @@ def detector_resolved_rates(
         efficiency_b=detector_efficiency_b,
     )
 
-    singles_a = cw.measured_single_rate(
-        true_singles_rate=cw.true_single_rate(
+    singles_a = cw.measured_singles_rate(
+        true_singles_rate=cw.true_singles_rate(
             brightness=brightness,
             efficiency=detector_efficiency_a,
         ),
         dark_count_rate=dark_count_a,
     )
-    singles_b = cw.measured_single_rate(
-        true_singles_rate=cw.true_single_rate(
+    singles_b = cw.measured_singles_rate(
+        true_singles_rate=cw.true_singles_rate(
             brightness=brightness,
             efficiency=detector_efficiency_b,
         ),

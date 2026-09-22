@@ -53,22 +53,22 @@ def secure_key_rate(
         dB_to_fraction(link.loss_b)
     )
 
-    true_singles_a = cw.true_single_rate(
+    true_singles_a = cw.true_singles_rate(
         brightness=brightness,
         efficiency=efficiency_a,
     )
 
-    true_singles_b = cw.true_single_rate(
+    true_singles_b = cw.true_singles_rate(
         brightness=brightness,
         efficiency=efficiency_b,
     )
 
-    measured_singles_a = cw.measured_single_rate(
+    measured_singles_a = cw.measured_singles_rate(
         true_singles_rate=true_singles_a,
         dark_count_rate=dark_count_rate_a,
     )
 
-    measured_singles_b = cw.measured_single_rate(
+    measured_singles_b = cw.measured_singles_rate(
         true_singles_rate=true_singles_b,
         dark_count_rate=dark_count_rate_b,
     )

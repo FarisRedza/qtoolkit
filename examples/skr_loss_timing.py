@@ -22,12 +22,12 @@ def secure_key_rate(
 
     efficiency = float(dB_to_fraction(total_attenuation_db / 2))
 
-    true_singles = cw.true_single_rate(
+    true_singles = cw.true_singles_rate(
         brightness=float(brightness),
         efficiency=efficiency,
     )
 
-    measured_singles = cw.measured_single_rate(
+    measured_singles = cw.measured_singles_rate(
         true_singles_rate=true_singles,
         dark_count_rate=dark_count_rate,
     )
