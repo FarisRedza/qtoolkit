@@ -4,6 +4,7 @@
 import math
 
 import numpy as np
+import numpy.typing as npt
 
 from ..misc_functions import binary_entropy
 
@@ -231,7 +232,7 @@ def secure_key_rate(
         *,
         sifting_probability: float = 0.5,
         error_correction_efficiency: float = 1.1
-) -> float:
+) -> npt.ArrayLike:
     r"""
     Equation 17
 
