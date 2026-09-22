@@ -18,6 +18,7 @@ from .misc_functions import (
 )
 
 from . import (
+    loss,
     polarisation,
     qkd,
     timetags,
@@ -28,6 +29,7 @@ __all__ = [
     'fraction_to_dB',
     'dB_to_fraction',
 
+    'loss',
     'polarisation',
     'qkd',
     'timetags',
