@@ -207,11 +207,11 @@ def qy(
     )
 
 def qber_from_visibility(visibility: float) -> float:
-    """
+    r"""
     Calculate QBER from visibility
 
     .. math:: 
-        \\text{QBER} = (1 - V)/2
+        \text{QBER} = (1 - V)/2
 
     Parameters
     ----------
@@ -228,11 +228,11 @@ def qber_from_visibility(visibility: float) -> float:
 # visibility functions
 
 def visibility(max: float, min: float) -> float:
-    """
+    r"""
     Calculate visibility
 
     .. math::
-        V = (C_\\text{max} - C_\\text{min}) / (C_\\text{max} + C_\\text{min})
+        V = (C_\text{max} - C_\text{min}) / (C_\text{max} + C_\text{min})
     
     Parameters
     ----------
@@ -248,11 +248,11 @@ def visibility(max: float, min: float) -> float:
     return (max - min) / (max + min)
 
 def visibility_from_qber(qber: float) -> float:
-    """
+    r"""
     Calculate visbility from QBER
 
     .. math::
-        V = 1 - 2 * \\text{QBER}
+        V = 1 - 2 * \text{QBER}
 
     Parameters
     ----------
@@ -282,7 +282,7 @@ def fidelity_from_visibility(
         visibility_x: float,
         visibility_y: typing.Optional[float] = None
 ) -> float:
-    """
+    r"""
     Estimate Bell-state fidelity from measured visibilities.
 
     With measurements in all three mutually unbiased bases:
@@ -324,13 +324,13 @@ def fidelity_from_qber(
     qx: float,
     qz: float,
 ) -> float:
-    """
+    r"""
     Two-basis Bell-state fidelity estimate.
 
     .. math::
-        V = 1 - 2 * \\text{QBER}
+        V = 1 - 2 * \text{QBER}
 
-        F ~= (V_x + V_z) / 2 \\\\
+        F ~= (V_x + V_z) / 2 \\
            = 1 - Q_x - Q_z
     """
     return 1 - qx - qz
@@ -340,11 +340,11 @@ def fidelity_from_qber(
 def purity(
         density_matrix: npt.ArrayLike
 ) -> float:
-    """
+    r"""
     Calculate quantum-state purity:
 
     .. math::
-        \\text{P} = \\text{Tr}(\\rho^2)
+        \text{P} = \text{Tr}(\rho^2)
     """
     rho = np.asarray(density_matrix, dtype=complex)
 
