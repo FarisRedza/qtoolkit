@@ -8,4 +8,5 @@ API
     polarisation/index
     qkd/index
     timetags/index
+    constants
     misc_functions

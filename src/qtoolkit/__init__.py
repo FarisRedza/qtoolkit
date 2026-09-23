@@ -11,6 +11,10 @@ The main subpackages are:
 - ``qtoolkit.timetags``: Timetag processing, coincidence counting, and simulation.
 """
 
+from .constants import (
+    SPEED_OF_LIGHT
+)
+
 from .misc_functions import (
     binary_entropy,
     fraction_to_dB,
@@ -21,10 +25,13 @@ from . import (
     loss,
     polarisation,
     qkd,
+    spdc,
     timetags,
 )
 
 __all__ = [
+    'SPEED_OF_LIGHT',
+
     'binary_entropy',
     'fraction_to_dB',
     'dB_to_fraction',
@@ -32,5 +39,6 @@ __all__ = [
     'loss',
     'polarisation',
     'qkd',
+    'spdc',
     'timetags',
 ]
