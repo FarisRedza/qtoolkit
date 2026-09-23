@@ -7,3 +7,4 @@ SPDC
     :maxdepth: 2
 
     materials
+    phasematching
