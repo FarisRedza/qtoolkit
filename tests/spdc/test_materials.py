@@ -24,7 +24,7 @@ def test_refractive_indices_are_physical(
     material,
     wavelength,
     temperature,
-):
+) -> None:
     n_o = material.ordinary_refractive_index(
         wavelength,
         temperature,
