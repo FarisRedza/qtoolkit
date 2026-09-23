@@ -6,9 +6,11 @@ from qtoolkit.spdc.materials import (
     RefractiveIndexAxis,
 )
 from qtoolkit.spdc.phasematching import (
-    poling_period_at_temperature,
     wavevector,
     wavevector_mismatch,
+    poling_period_at_temperature,
+    poling_period_at_reference_temperature,
+    find_poling_period,
 )
 
 
@@ -258,4 +260,88 @@ def test_wavevector_mismatch_qpm_order() -> None:
     assert (
         delta_k_3 - delta_k_1
         == pytest.approx(expected_difference)
+    )
+
+def test_poling_period_temperature_round_trip():
+    poling_period = 19e-6
+    temperature = 100.0
+
+    expanded = poling_period_at_temperature(
+        poling_period,
+        temperature,
+    )
+
+    result = poling_period_at_reference_temperature(
+        expanded,
+        temperature,
+    )
+
+    assert result == pytest.approx(
+        poling_period
+    )
+
+def test_find_poling_period_phase_matches():
+    material = MgOLithiumNiobate()
+
+    pump_wavelength = 775e-9
+    signal_wavelength = 1550e-9
+    idler_wavelength = 1550e-9
+    temperature = 50.0
+
+    axis = RefractiveIndexAxis.EXTRAORDINARY
+
+    poling_period = find_poling_period(
+        pump_wavelength=pump_wavelength,
+        signal_wavelength=signal_wavelength,
+        idler_wavelength=idler_wavelength,
+        temperature=temperature,
+        material=material,
+        pump_axis=axis,
+        signal_axis=axis,
+        idler_axis=axis,
+    )
+
+    delta_k = wavevector_mismatch(
+        pump_wavelength=pump_wavelength,
+        signal_wavelength=signal_wavelength,
+        idler_wavelength=idler_wavelength,
+        temperature=temperature,
+        poling_period=poling_period,
+        material=material,
+        pump_axis=axis,
+        signal_axis=axis,
+        idler_axis=axis,
+    )
+
+    assert delta_k == pytest.approx(
+        0.0,
+        abs=1e-8,
+    )
+
+def test_find_poling_period_scales_with_qpm_order():
+    material = MgOLithiumNiobate()
+
+    kwargs = {
+        'pump_wavelength': 775e-9,
+        'signal_wavelength': 1550e-9,
+        'idler_wavelength': 1550e-9,
+        'temperature': 50.0,
+        'material': material,
+        'pump_axis': RefractiveIndexAxis.EXTRAORDINARY,
+        'signal_axis': RefractiveIndexAxis.EXTRAORDINARY,
+        'idler_axis': RefractiveIndexAxis.EXTRAORDINARY,
+    }
+
+    first_order = find_poling_period(
+        **kwargs,
+        qpm_order=1,
+    )
+
+    third_order = find_poling_period(
+        **kwargs,
+        qpm_order=3,
+    )
+
+    assert third_order == pytest.approx(
+        3 * first_order
     )
