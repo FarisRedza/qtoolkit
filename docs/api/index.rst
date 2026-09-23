@@ -7,6 +7,7 @@ API
     loss/index
     polarisation/index
     qkd/index
+    spdc/index
     timetags/index
     constants
     misc_functions
