@@ -86,20 +86,20 @@ class MgOLithiumNiobate(NonlinearMaterial):
         temperature: float,
         axis: RefractiveIndexAxis,
     ) -> typing.Union[float, npt.NDArray[np.float64]]:
-        if axis == 'ordinary':
+        if axis is RefractiveIndexAxis.ORDINARY:
             return self.ordinary_refractive_index(
                 wavelength,
                 temperature,
             )
 
-        if axis == 'extraordinary':
+        if axis is RefractiveIndexAxis.EXTRAORDINARY:
             return self.extraordinary_refractive_index(
                 wavelength,
                 temperature,
             )
 
         raise ValueError(
-            "polarisation must be 'ordinary' or 'extraordinary'."
+            "axis must be 'ordinary' or 'extraordinary'."
         )
 
     def extraordinary_refractive_index(
