@@ -9,3 +9,6 @@ Examples
    skr_loss
    skr_loss_timing
    qber_waveplate_rotation
+   phasematching
+   phasematching_spectrum
+   joint_spectral_intensity
