@@ -6,7 +6,7 @@ from qtoolkit.spdc.materials import (
 
 
 @pytest.fixture
-def material():
+def material() -> None:
     return MgOLithiumNiobate()
 
 

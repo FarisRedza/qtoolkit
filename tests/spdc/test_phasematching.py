@@ -262,7 +262,7 @@ def test_wavevector_mismatch_qpm_order() -> None:
         == pytest.approx(expected_difference)
     )
 
-def test_poling_period_temperature_round_trip():
+def test_poling_period_temperature_round_trip() -> None:
     poling_period = 19e-6
     temperature = 100.0
 
@@ -280,7 +280,7 @@ def test_poling_period_temperature_round_trip():
         poling_period
     )
 
-def test_find_poling_period_phase_matches():
+def test_find_poling_period_phase_matches() -> None:
     material = MgOLithiumNiobate()
 
     pump_wavelength = 775e-9
@@ -318,7 +318,7 @@ def test_find_poling_period_phase_matches():
         abs=1e-8,
     )
 
-def test_find_poling_period_scales_with_qpm_order():
+def test_find_poling_period_scales_with_qpm_order() -> None:
     material = MgOLithiumNiobate()
 
     kwargs = {
