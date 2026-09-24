@@ -8,3 +8,4 @@ SPDC
 
     materials
     phasematching
+    spectral
