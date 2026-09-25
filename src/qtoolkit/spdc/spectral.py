@@ -530,8 +530,9 @@ def pump_wavelength_fwhm_to_angular_frequency_std(
 
     Experimental pump bandwidths are commonly specified as the FWHM
     of the spectral intensity in wavelength. This function converts
-    that quantity to the standard deviation of the Gaussian spectral
-    amplitude in angular frequency.
+    the wavelength interval between the two half-maximum points to an
+    equivalent angular-frequency FWHM, and then converts this to the
+    standard deviation of the Gaussian spectral amplitude.
 
     Parameters
     ----------
@@ -543,8 +544,8 @@ def pump_wavelength_fwhm_to_angular_frequency_std(
     Returns
     -------
     float
-        Standard deviation of the Gaussian spectral amplitude in
-        radians per second.
+        Equivalent standard deviation of the Gaussian spectral
+        amplitude in radians per second.
 
     Raises
     ------
@@ -554,9 +555,22 @@ def pump_wavelength_fwhm_to_angular_frequency_std(
 
     Notes
     -----
-    The conversion from the two wavelength half-maximum points to
-    angular frequency is performed exactly rather than using the
-    narrow-band approximation.
+    A Gaussian in wavelength is not exactly Gaussian in angular
+    frequency because
+
+    .. math::
+
+        \omega = \frac{2\pi c}{\lambda}
+
+    is nonlinear. Consequently, there is no exact conversion between
+    a wavelength-domain Gaussian FWHM and the standard deviation of a
+    Gaussian centred at the corresponding angular frequency.
+
+    This function converts the two wavelength half-maximum points to
+    angular frequency and uses their separation as an equivalent
+    angular-frequency FWHM. The result is appropriate in the
+    narrow-band regime, where the wavelength-to-frequency mapping is
+    approximately linear across the pump spectrum.
     """
     if central_wavelength <= 0:
         raise ValueError(
