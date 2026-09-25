@@ -181,3 +181,82 @@ def test_effective_extraordinary_index_angle_array(
     )
 
     assert result.shape == angles.shape
+
+@pytest.mark.parametrize(
+    'wavelength, expected',
+    [
+        (523.5e-9, 2.331502701758576),
+        (785e-9, 2.261949791474799),
+        (1571.500956022945e-9, 2.215371291126802),
+    ],
+)
+def test_ordinary_refractive_index_regression(
+    material,
+    wavelength,
+    expected,
+) -> None:
+    """Regression values independently evaluated from the Gayer model."""
+    result = material.ordinary_refractive_index(
+        wavelength,
+        84.0,
+    )
+
+    assert result == pytest.approx(
+        expected,
+        rel=1e-12,
+    )
+
+
+@pytest.mark.parametrize(
+    'wavelength, expected',
+    [
+        (523.5e-9, 2.246608420968678),
+        (785e-9, 2.187058845556199),
+        (1571.500956022945e-9, 2.147248608670988),
+    ],
+)
+def test_extraordinary_refractive_index_regression(
+    material,
+    wavelength,
+    expected,
+) -> None:
+    """Regression values independently evaluated from the Gayer model."""
+    result = material.extraordinary_refractive_index(
+        wavelength,
+        84.0,
+    )
+
+    assert result == pytest.approx(
+        expected,
+        rel=1e-12,
+    )
+
+def test_refractive_index_array_matches_scalar_evaluation(
+    material,
+) -> None:
+    wavelengths = np.array([
+        523.5e-9,
+        785e-9,
+        1571.500956022945e-9,
+    ])
+
+    result = material.refractive_index(
+        wavelengths,
+        84.0,
+        RefractiveIndexAxis.EXTRAORDINARY,
+    )
+
+    expected = np.array([
+        material.refractive_index(
+            wavelength,
+            84.0,
+            RefractiveIndexAxis.EXTRAORDINARY,
+        )
+        for wavelength in wavelengths
+    ])
+
+    np.testing.assert_allclose(
+        result,
+        expected,
+        rtol=1e-14,
+    )
