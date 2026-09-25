@@ -20,12 +20,123 @@ class NonlinearMaterial(ABC):
         wavelength: npt.ArrayLike,
         temperature: float,
         axis: RefractiveIndexAxis,
-    ) -> typing.Union[float, npt.NDArray[np.float64]]:
+    ) -> typing.Union[
+        float,
+        npt.NDArray[np.float64],
+    ]:
         """Calculate the refractive index."""
         ...
 
 
-class MgOLithiumNiobate(NonlinearMaterial):
+class UniaxialMaterial(NonlinearMaterial):
+    """Base class for uniaxial nonlinear optical materials."""
+
+    def refractive_index_at_angle(
+        self,
+        wavelength: npt.ArrayLike,
+        temperature: float,
+        axis: RefractiveIndexAxis,
+        angle: npt.ArrayLike,
+    ) -> typing.Union[
+        float,
+        npt.NDArray[np.float64],
+    ]:
+        r"""
+        Calculate the refractive index for propagation at an angle.
+
+        For an ordinary wave, the refractive index is independent of
+        propagation direction.
+
+        For an extraordinary wave in a uniaxial crystal,
+
+        .. math::
+
+            \frac{1}{n_\mathrm{eff}^2}
+            =
+            \frac{\cos^2\theta}{n_o^2}
+            +
+            \frac{\sin^2\theta}{n_e^2},
+
+        where :math:`\theta` is the angle between the propagation
+        direction and the optic axis.
+
+        Therefore,
+
+        .. math::
+
+            n_\mathrm{eff}(0) = n_o
+
+        and
+
+        .. math::
+
+            n_\mathrm{eff}(\pi/2) = n_e.
+
+        Parameters
+        ----------
+        wavelength
+            Vacuum wavelength in metres.
+        temperature
+            Crystal temperature in degrees Celsius.
+        axis
+            Refractive-index axis.
+        angle
+            Angle between the propagation direction and optic axis,
+            in radians.
+
+        Returns
+        -------
+        float or numpy.ndarray
+            Effective refractive index.
+        """
+        if axis is RefractiveIndexAxis.ORDINARY:
+            return self.refractive_index(
+                wavelength,
+                temperature,
+                RefractiveIndexAxis.ORDINARY,
+            )
+
+        if axis is not RefractiveIndexAxis.EXTRAORDINARY:
+            raise ValueError(
+                "axis must be 'ordinary' or 'extraordinary'."
+            )
+
+        n_o = np.asarray(
+            self.refractive_index(
+                wavelength,
+                temperature,
+                RefractiveIndexAxis.ORDINARY,
+            ),
+            dtype=np.float64,
+        )
+
+        n_e = np.asarray(
+            self.refractive_index(
+                wavelength,
+                temperature,
+                RefractiveIndexAxis.EXTRAORDINARY,
+            ),
+            dtype=np.float64,
+        )
+
+        angle_array = np.asarray(
+            angle,
+            dtype=np.float64,
+        )
+
+        result = 1 / np.sqrt(
+            np.cos(angle_array)**2 / n_o**2
+            + np.sin(angle_array)**2 / n_e**2
+        )
+
+        return (
+            float(result)
+            if result.ndim == 0
+            else result
+        )
+
+
+class MgOLithiumNiobate(UniaxialMaterial):
     r"""
     5 mol% MgO-doped congruent lithium niobate.
 
@@ -85,7 +196,10 @@ class MgOLithiumNiobate(NonlinearMaterial):
         wavelength: npt.ArrayLike,
         temperature: float,
         axis: RefractiveIndexAxis,
-    ) -> typing.Union[float, npt.NDArray[np.float64]]:
+    ) -> typing.Union[
+        float,
+        npt.NDArray[np.float64],
+    ]:
         if axis is RefractiveIndexAxis.ORDINARY:
             return self.ordinary_refractive_index(
                 wavelength,
@@ -106,7 +220,10 @@ class MgOLithiumNiobate(NonlinearMaterial):
         self,
         wavelength: npt.ArrayLike,
         temperature: float,
-    ) -> typing.Union[float, npt.NDArray[np.float64]]:
+    ) -> typing.Union[
+        float,
+        npt.NDArray[np.float64],
+    ]:
         wavelength_um = (
             np.asarray(wavelength)
             * 1e6
@@ -150,7 +267,10 @@ class MgOLithiumNiobate(NonlinearMaterial):
         self,
         wavelength: npt.ArrayLike,
         temperature: float,
-    ) -> typing.Union[float, npt.NDArray[np.float64]]:
+    ) -> typing.Union[
+        float,
+        npt.NDArray[np.float64],
+    ]:
         wavelength_um = (
             np.asarray(wavelength)
             * 1e6

@@ -16,6 +16,7 @@ from qtoolkit.spdc.phasematching import (
     find_phase_matching_temperatures,
     find_phase_matching_wavelengths,
     find_phase_matching_wavelength_pairs,
+    find_phase_matching_angle
 )
 
 def test_conjugate_wavelength_degenerate() -> None:
@@ -931,3 +932,115 @@ def test_find_phase_matching_wavelength_pairs_no_roots() -> None:
     )
 
     assert result.shape == (0, 2)
+
+def test_wavevector_mismatch_angle_pi_over_two_matches_principal_index(
+) -> None:
+    material = MgOLithiumNiobate()
+    axis = RefractiveIndexAxis.EXTRAORDINARY
+
+    pump_wavelength = 523.5e-9
+    signal_wavelength = 785e-9
+
+    idler_wavelength = conjugate_wavelength(
+        pump_wavelength,
+        signal_wavelength,
+    )
+
+    kwargs = dict(
+        pump_wavelength=pump_wavelength,
+        signal_wavelength=signal_wavelength,
+        idler_wavelength=idler_wavelength,
+        temperature=84.0,
+        poling_period=7.15e-6,
+        material=material,
+        pump_axis=axis,
+        signal_axis=axis,
+        idler_axis=axis,
+    )
+
+    principal = wavevector_mismatch(
+        **kwargs,
+    )
+
+    angled = wavevector_mismatch(
+        **kwargs,
+        pump_angle=np.pi / 2,
+        signal_angle=np.pi / 2,
+        idler_angle=np.pi / 2,
+    )
+
+    assert angled == pytest.approx(
+        principal,
+        abs=1e-6,
+    )
+
+
+def test_find_phase_matching_angle() -> None:
+    material = MgOLithiumNiobate()
+    axis = RefractiveIndexAxis.EXTRAORDINARY
+
+    pump_wavelength = 523.5e-9
+    signal_wavelength = 785e-9
+
+    idler_wavelength = conjugate_wavelength(
+        pump_wavelength,
+        signal_wavelength,
+    )
+
+    angle = find_phase_matching_angle(
+        pump_wavelength=pump_wavelength,
+        signal_wavelength=signal_wavelength,
+        idler_wavelength=idler_wavelength,
+        temperature=84.0,
+        poling_period=7.15e-6,
+        material=material,
+        pump_axis=axis,
+        signal_axis=axis,
+        idler_axis=axis,
+    )
+
+    delta_k = wavevector_mismatch(
+        pump_wavelength=pump_wavelength,
+        signal_wavelength=signal_wavelength,
+        idler_wavelength=idler_wavelength,
+        temperature=84.0,
+        poling_period=7.15e-6,
+        material=material,
+        pump_axis=axis,
+        signal_axis=axis,
+        idler_axis=axis,
+        pump_angle=angle,
+        signal_angle=angle,
+        idler_angle=angle,
+    )
+
+    assert 0 < angle < np.pi / 2
+
+    assert delta_k == pytest.approx(
+        0.0,
+        abs=1e-3,
+    )
+
+def test_find_phase_matching_angle_invalid_bounds() -> None:
+    material = MgOLithiumNiobate()
+    axis = RefractiveIndexAxis.EXTRAORDINARY
+
+    with pytest.raises(
+        ValueError,
+        match='lower angle bound',
+    ):
+        find_phase_matching_angle(
+            pump_wavelength=523.5e-9,
+            signal_wavelength=785e-9,
+            idler_wavelength=1571.5e-9,
+            temperature=84.0,
+            poling_period=7.15e-6,
+            material=material,
+            pump_axis=axis,
+            signal_axis=axis,
+            idler_axis=axis,
+            angle_bounds=(
+                np.pi / 2,
+                0.0,
+            ),
+        )

@@ -312,6 +312,9 @@ def joint_spectral_amplitude(
     signal_axis: RefractiveIndexAxis,
     idler_axis: RefractiveIndexAxis,
     qpm_order: int = 1,
+    pump_angle: typing.Optional[float] = None,
+    signal_angle: typing.Optional[float] = None,
+    idler_angle: typing.Optional[float] = None,
 ) -> typing.Union[
     complex,
     npt.NDArray[np.complex128],
@@ -363,7 +366,13 @@ def joint_spectral_amplitude(
         Refractive-index axis of the idler.
     qpm_order
         Quasi-phase-matching order. Default is 1.
-
+    pump_angle
+        Optional pump propagation angle in radians.
+    signal_angle
+        Optional signal propagation angle in radians.
+    idler_angle
+        Optional idler propagation angle in radians.
+        
     Returns
     -------
     complex or numpy.ndarray
@@ -431,6 +440,9 @@ def joint_spectral_amplitude(
         signal_axis=signal_axis,
         idler_axis=idler_axis,
         qpm_order=qpm_order,
+        pump_angle=pump_angle,
+        signal_angle=signal_angle,
+        idler_angle=idler_angle,
     )
 
     phase_matching = phase_matching_amplitude(
@@ -494,5 +506,101 @@ def joint_spectral_intensity(
         else result.astype(
             np.float64,
             copy=False,
+        )
+    )
+
+def pump_wavelength_fwhm_to_angular_frequency_std(
+    central_wavelength: float,
+    wavelength_fwhm: float,
+) -> float:
+    r"""
+    Convert pump wavelength FWHM to angular-frequency amplitude width.
+
+    ``joint_spectral_amplitude`` describes the pump using a Gaussian
+    spectral amplitude,
+
+    .. math::
+
+        \alpha(\omega)
+        =
+        \exp\left[
+            -\frac{(\omega-\omega_0)^2}
+            {2\sigma_\omega^2}
+        \right].
+
+    Experimental pump bandwidths are commonly specified as the FWHM
+    of the spectral intensity in wavelength. This function converts
+    that quantity to the standard deviation of the Gaussian spectral
+    amplitude in angular frequency.
+
+    Parameters
+    ----------
+    central_wavelength
+        Central pump wavelength in metres.
+    wavelength_fwhm
+        Intensity FWHM in wavelength, in metres.
+
+    Returns
+    -------
+    float
+        Standard deviation of the Gaussian spectral amplitude in
+        radians per second.
+
+    Raises
+    ------
+    ValueError
+        If either wavelength is not positive, or if the FWHM would
+        extend to zero wavelength.
+
+    Notes
+    -----
+    The conversion from the two wavelength half-maximum points to
+    angular frequency is performed exactly rather than using the
+    narrow-band approximation.
+    """
+    if central_wavelength <= 0:
+        raise ValueError(
+            'Central wavelength must be greater than zero.'
+        )
+
+    if wavelength_fwhm <= 0:
+        raise ValueError(
+            'Wavelength FWHM must be greater than zero.'
+        )
+
+    lower_wavelength = (
+        central_wavelength
+        - wavelength_fwhm / 2
+    )
+
+    upper_wavelength = (
+        central_wavelength
+        + wavelength_fwhm / 2
+    )
+
+    if lower_wavelength <= 0:
+        raise ValueError(
+            'Wavelength FWHM is too large for the '
+            'specified central wavelength.'
+        )
+
+    upper_angular_frequency = angular_frequency(
+        lower_wavelength
+    )
+
+    lower_angular_frequency = angular_frequency(
+        upper_wavelength
+    )
+
+    intensity_fwhm = (
+        upper_angular_frequency
+        - lower_angular_frequency
+    )
+
+    return float(
+        intensity_fwhm
+        / (
+            2
+            * np.sqrt(np.log(2))
         )
     )

@@ -7,8 +7,8 @@ import scipy
 from .materials import (
     NonlinearMaterial,
     RefractiveIndexAxis,
+    UniaxialMaterial,
 )
-
 def conjugate_wavelength(
     pump_wavelength: npt.ArrayLike,
     wavelength: npt.ArrayLike,
@@ -113,6 +113,44 @@ def wavevector(
         else result
     )
 
+def _material_refractive_index(
+    wavelength: npt.ArrayLike,
+    temperature: float,
+    material: NonlinearMaterial,
+    axis: RefractiveIndexAxis,
+    angle: typing.Optional[float],
+) -> typing.Union[
+    float,
+    npt.NDArray[np.float64],
+]:
+    """
+    Evaluate a material refractive index, optionally at an angle.
+
+    If ``angle`` is None, the principal refractive index is returned.
+    If an angle is supplied, the material must be uniaxial.
+    """
+    if angle is None:
+        return material.refractive_index(
+            wavelength,
+            temperature,
+            axis,
+        )
+
+    if not isinstance(
+        material,
+        UniaxialMaterial,
+    ):
+        raise ValueError(
+            'Propagation angles require a '
+            'uniaxial material model.'
+        )
+
+    return material.refractive_index_at_angle(
+        wavelength,
+        temperature,
+        axis,
+        angle,
+    )
 
 def wavevector_mismatch(
     pump_wavelength: npt.ArrayLike,
@@ -125,6 +163,9 @@ def wavevector_mismatch(
     signal_axis: RefractiveIndexAxis,
     idler_axis: RefractiveIndexAxis,
     qpm_order: int = 1,
+    pump_angle: typing.Optional[float] = None,
+    signal_angle: typing.Optional[float] = None,
+    idler_angle: typing.Optional[float] = None,
 ) -> typing.Union[
     float,
     npt.NDArray[np.float64],
@@ -148,25 +189,72 @@ def wavevector_mismatch(
     .. math::
 
         \Delta k = 0.
-        
+
+    For a uniaxial material, optional propagation angles may be
+    supplied for the pump, signal, and idler. Angles are measured
+    between the propagation direction and optic axis and are expressed
+    in radians.
+
+    If an angle is omitted, the corresponding principal refractive
+    index is used.
+
+    Parameters
+    ----------
+    pump_wavelength
+        Pump vacuum wavelength in metres.
+    signal_wavelength
+        Signal vacuum wavelength in metres.
+    idler_wavelength
+        Idler vacuum wavelength in metres.
+    temperature
+        Crystal temperature in degrees Celsius.
+    poling_period
+        Poling period at the 19 degrees Celsius reference temperature,
+        in metres.
+    material
+        Nonlinear optical material.
+    pump_axis
+        Refractive-index axis of the pump.
+    signal_axis
+        Refractive-index axis of the signal.
+    idler_axis
+        Refractive-index axis of the idler.
+    qpm_order
+        Quasi-phase-matching order. Default is 1.
+    pump_angle
+        Optional pump propagation angle in radians.
+    signal_angle
+        Optional signal propagation angle in radians.
+    idler_angle
+        Optional idler propagation angle in radians.
+
+    Returns
+    -------
+    float or numpy.ndarray
+        Wavevector mismatch in radians per metre.
     """
-
-    n_p = material.refractive_index(
-        pump_wavelength,
-        temperature,
-        pump_axis,
+    n_p = _material_refractive_index(
+        wavelength=pump_wavelength,
+        temperature=temperature,
+        material=material,
+        axis=pump_axis,
+        angle=pump_angle,
     )
 
-    n_s = material.refractive_index(
-        signal_wavelength,
-        temperature,
-        signal_axis,
+    n_s = _material_refractive_index(
+        wavelength=signal_wavelength,
+        temperature=temperature,
+        material=material,
+        axis=signal_axis,
+        angle=signal_angle,
     )
 
-    n_i = material.refractive_index(
-        idler_wavelength,
-        temperature,
-        idler_axis,
+    n_i = _material_refractive_index(
+        wavelength=idler_wavelength,
+        temperature=temperature,
+        material=material,
+        axis=idler_axis,
+        angle=idler_angle,
     )
 
     k_p = wavevector(
@@ -195,7 +283,6 @@ def wavevector_mismatch(
         - k_i
         - 2 * np.pi * qpm_order / period
     )
-
 
 _POLING_REFERENCE_TEMPERATURE = 19.0
 _THERMAL_EXPANSION_ALPHA = 1.53e-5
@@ -1165,3 +1252,128 @@ def find_phase_matching_wavelength_pairs(
         signal_roots,
         idler_roots,
     ))
+
+def find_phase_matching_angle(
+    pump_wavelength: float,
+    signal_wavelength: float,
+    idler_wavelength: float,
+    temperature: float,
+    poling_period: float,
+    material: UniaxialMaterial,
+    pump_axis: RefractiveIndexAxis,
+    signal_axis: RefractiveIndexAxis,
+    idler_axis: RefractiveIndexAxis,
+    angle_bounds: typing.Tuple[
+        float,
+        float,
+    ] = (0.0, np.pi / 2),
+    qpm_order: int = 1,
+) -> float:
+    r"""
+    Find a common propagation angle for quasi-phase matching.
+
+    The angle is found by solving
+
+    .. math::
+
+        \Delta k(\theta) = 0,
+
+    where the same propagation angle :math:`\theta` is used for the
+    pump, signal, and idler.
+
+    The angle is measured between the propagation direction and the
+    optic axis.
+
+    Parameters
+    ----------
+    pump_wavelength
+        Pump vacuum wavelength in metres.
+    signal_wavelength
+        Signal vacuum wavelength in metres.
+    idler_wavelength
+        Idler vacuum wavelength in metres.
+    temperature
+        Crystal temperature in degrees Celsius.
+    poling_period
+        Poling period at the 19 degrees Celsius reference temperature,
+        in metres.
+    material
+        Uniaxial nonlinear optical material.
+    pump_axis
+        Refractive-index axis of the pump.
+    signal_axis
+        Refractive-index axis of the signal.
+    idler_axis
+        Refractive-index axis of the idler.
+    angle_bounds
+        Lower and upper propagation-angle bounds in radians.
+        Default is 0 to pi/2.
+    qpm_order
+        Quasi-phase-matching order. Default is 1.
+
+    Returns
+    -------
+    float
+        Phase-matching angle in radians.
+
+    Raises
+    ------
+    ValueError
+        If the angle bounds are invalid or no phase-matching angle
+        exists within the interval.
+    """
+    lower_angle, upper_angle = angle_bounds
+
+    if lower_angle < 0:
+        raise ValueError(
+            'The lower angle bound must not be negative.'
+        )
+
+    if upper_angle > np.pi / 2:
+        raise ValueError(
+            'The upper angle bound must not exceed pi / 2.'
+        )
+
+    if lower_angle >= upper_angle:
+        raise ValueError(
+            'The lower angle bound must be less than '
+            'the upper angle bound.'
+        )
+
+    def mismatch(
+        angle: float,
+    ) -> float:
+        return float(
+            wavevector_mismatch(
+                pump_wavelength=pump_wavelength,
+                signal_wavelength=signal_wavelength,
+                idler_wavelength=idler_wavelength,
+                temperature=temperature,
+                poling_period=poling_period,
+                material=material,
+                pump_axis=pump_axis,
+                signal_axis=signal_axis,
+                idler_axis=idler_axis,
+                qpm_order=qpm_order,
+                pump_angle=angle,
+                signal_angle=angle,
+                idler_angle=angle,
+            )
+        )
+
+    try:
+        return float(
+            scipy.optimize.brentq(
+                mismatch,
+                lower_angle,
+                upper_angle,
+                xtol=1e-12,
+                rtol=_ROOT_RTOL,
+            )
+        )
+    except ValueError as error:
+        raise ValueError(
+            'No phase-matching angle was found '
+            f'between {lower_angle} and '
+            f'{upper_angle} radians.'
+        ) from error

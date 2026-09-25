@@ -13,6 +13,7 @@ from qtoolkit.spdc.phasematching import (
 from qtoolkit.spdc.spectral import (
     angular_frequency,
     wavelength_from_angular_frequency,
+    pump_wavelength_fwhm_to_angular_frequency_std,
     gaussian_pump_amplitude,
     phase_matching_amplitude,
     joint_spectral_amplitude,
@@ -722,5 +723,146 @@ def test_joint_spectral_intensity_grid_peaks_near_phase_matching() -> None:
     assert jsi[maximum_index] == pytest.approx(
         1.0,
         rel=1e-10,
+        abs=1e-12,
+    )
+
+def test_pump_wavelength_fwhm_to_angular_frequency_std() -> None:
+    central_wavelength = 523.5e-9
+    wavelength_fwhm = 92e-12
+
+    result = (
+        pump_wavelength_fwhm_to_angular_frequency_std(
+            central_wavelength,
+            wavelength_fwhm,
+        )
+    )
+
+    assert result > 0
+
+
+def test_pump_wavelength_fwhm_conversion_recovers_fwhm() -> None:
+    central_wavelength = 523.5e-9
+    wavelength_fwhm = 92e-12
+
+    sigma = (
+        pump_wavelength_fwhm_to_angular_frequency_std(
+            central_wavelength,
+            wavelength_fwhm,
+        )
+    )
+
+    omega_low = angular_frequency(
+        central_wavelength
+        + wavelength_fwhm / 2
+    )
+
+    omega_high = angular_frequency(
+        central_wavelength
+        - wavelength_fwhm / 2
+    )
+
+    intensity_low = (
+        gaussian_pump_amplitude(
+            omega_low,
+            angular_frequency(
+                central_wavelength
+            ),
+            sigma,
+        )**2
+    )
+
+    intensity_high = (
+        gaussian_pump_amplitude(
+            omega_high,
+            angular_frequency(
+                central_wavelength
+            ),
+            sigma,
+        )**2
+    )
+
+    # Because wavelength is nonlinear in angular frequency, the two
+    # wavelength half-maximum points are not exactly symmetric about
+    # the central angular frequency. For a narrow pump bandwidth the
+    # difference is negligible.
+    assert intensity_low == pytest.approx(
+        0.5,
+        rel=5e-4,
+    )
+
+    assert intensity_high == pytest.approx(
+        0.5,
+        rel=5e-4,
+    )
+
+
+@pytest.mark.parametrize(
+    'central_wavelength, wavelength_fwhm',
+    [
+        (0.0, 1e-12),
+        (-500e-9, 1e-12),
+        (500e-9, 0.0),
+        (500e-9, -1e-12),
+    ],
+)
+def test_pump_wavelength_fwhm_rejects_non_positive_values(
+    central_wavelength,
+    wavelength_fwhm,
+) -> None:
+    with pytest.raises(ValueError):
+        pump_wavelength_fwhm_to_angular_frequency_std(
+            central_wavelength,
+            wavelength_fwhm,
+        )
+
+
+def test_joint_spectral_amplitude_angle_pi_over_two_matches_default(
+) -> None:
+    material = MgOLithiumNiobate()
+    axis = RefractiveIndexAxis.EXTRAORDINARY
+
+    pump_wavelength = 523.5e-9
+    signal_wavelength = 790.6e-9
+
+    idler_wavelength = conjugate_wavelength(
+        pump_wavelength,
+        signal_wavelength,
+    )
+
+    pump_bandwidth_std = (
+        pump_wavelength_fwhm_to_angular_frequency_std(
+            pump_wavelength,
+            92e-12,
+        )
+    )
+
+    kwargs = dict(
+        signal_wavelength=signal_wavelength,
+        idler_wavelength=idler_wavelength,
+        pump_wavelength=pump_wavelength,
+        pump_bandwidth_std=pump_bandwidth_std,
+        crystal_length=20e-3,
+        temperature=84.0,
+        poling_period=7.15e-6,
+        material=material,
+        pump_axis=axis,
+        signal_axis=axis,
+        idler_axis=axis,
+    )
+
+    default = joint_spectral_amplitude(
+        **kwargs,
+    )
+
+    angled = joint_spectral_amplitude(
+        **kwargs,
+        pump_angle=np.pi / 2,
+        signal_angle=np.pi / 2,
+        idler_angle=np.pi / 2,
+    )
+
+    assert angled == pytest.approx(
+        default,
+        rel=1e-12,
         abs=1e-12,
     )
