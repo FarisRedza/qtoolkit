@@ -227,10 +227,20 @@ def test_fidelity_from_three_visibilities() -> None:
     result = qtoolkit.qkd.fidelity_from_visibility(
         visibility_z=0.9,
         visibility_x=0.8,
-        visibility_y=0.7,
+        visibility_y=-0.7,
     )
 
     assert result == pytest.approx(0.85)
+
+
+def test_fidelity_from_three_ideal_phi_plus_correlations() -> None:
+    result = qtoolkit.qkd.fidelity_from_visibility(
+        visibility_z=1.0,
+        visibility_x=1.0,
+        visibility_y=-1.0,
+    )
+
+    assert result == pytest.approx(1.0)
 
 
 def test_fidelity_from_qber() -> None:
