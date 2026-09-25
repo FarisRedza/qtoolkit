@@ -1044,3 +1044,195 @@ def test_find_phase_matching_angle_invalid_bounds() -> None:
                 0.0,
             ),
         )
+
+def test_find_poling_period_with_angle_phase_matches() -> None:
+    material = MgOLithiumNiobate()
+    axis = RefractiveIndexAxis.EXTRAORDINARY
+    angle = np.deg2rad(80.0)
+    pump_wavelength = 523.5e-9
+    idler_wavelength = 785e-9
+    signal_wavelength = conjugate_wavelength(
+        pump_wavelength,
+        idler_wavelength,
+    )
+
+    poling_period = find_poling_period(
+        pump_wavelength=pump_wavelength,
+        signal_wavelength=signal_wavelength,
+        idler_wavelength=idler_wavelength,
+        temperature=84.0,
+        material=material,
+        pump_axis=axis,
+        signal_axis=axis,
+        idler_axis=axis,
+        pump_angle=angle,
+        signal_angle=angle,
+        idler_angle=angle,
+    )
+
+    delta_k = wavevector_mismatch(
+        pump_wavelength=pump_wavelength,
+        signal_wavelength=signal_wavelength,
+        idler_wavelength=idler_wavelength,
+        temperature=84.0,
+        poling_period=poling_period,
+        material=material,
+        pump_axis=axis,
+        signal_axis=axis,
+        idler_axis=axis,
+        pump_angle=angle,
+        signal_angle=angle,
+        idler_angle=angle,
+    )
+
+    assert delta_k == pytest.approx(0.0, abs=1e-6)
+
+
+def test_find_phase_matching_temperature_with_angle() -> None:
+    material = MgOLithiumNiobate()
+    axis = RefractiveIndexAxis.EXTRAORDINARY
+    angle = np.deg2rad(80.0)
+    pump_wavelength = 775e-9
+    signal_wavelength = 1550e-9
+    idler_wavelength = 1550e-9
+    expected_temperature = 100.0
+
+    poling_period = find_poling_period(
+        pump_wavelength=pump_wavelength,
+        signal_wavelength=signal_wavelength,
+        idler_wavelength=idler_wavelength,
+        temperature=expected_temperature,
+        material=material,
+        pump_axis=axis,
+        signal_axis=axis,
+        idler_axis=axis,
+        pump_angle=angle,
+        signal_angle=angle,
+        idler_angle=angle,
+    )
+
+    result = find_phase_matching_temperature(
+        pump_wavelength=pump_wavelength,
+        signal_wavelength=signal_wavelength,
+        idler_wavelength=idler_wavelength,
+        poling_period=poling_period,
+        material=material,
+        pump_axis=axis,
+        signal_axis=axis,
+        idler_axis=axis,
+        pump_angle=angle,
+        signal_angle=angle,
+        idler_angle=angle,
+    )
+
+    assert result == pytest.approx(expected_temperature)
+
+
+def test_find_phase_matching_wavelengths_with_angle() -> None:
+    material = MgOLithiumNiobate()
+    axis = RefractiveIndexAxis.EXTRAORDINARY
+    angle = np.deg2rad(80.0)
+    pump_wavelength = 775e-9
+    expected_signal_wavelength = 1200e-9
+    expected_idler_wavelength = conjugate_wavelength(
+        pump_wavelength,
+        expected_signal_wavelength,
+    )
+    temperature = 100.0
+
+    poling_period = find_poling_period(
+        pump_wavelength=pump_wavelength,
+        signal_wavelength=expected_signal_wavelength,
+        idler_wavelength=expected_idler_wavelength,
+        temperature=temperature,
+        material=material,
+        pump_axis=axis,
+        signal_axis=axis,
+        idler_axis=axis,
+        pump_angle=angle,
+        signal_angle=angle,
+        idler_angle=angle,
+    )
+
+    signal_wavelength, idler_wavelength = find_phase_matching_wavelengths(
+        pump_wavelength=pump_wavelength,
+        temperature=temperature,
+        poling_period=poling_period,
+        material=material,
+        pump_axis=axis,
+        signal_axis=axis,
+        idler_axis=axis,
+        signal_wavelength_bounds=(1100e-9, 1300e-9),
+        pump_angle=angle,
+        signal_angle=angle,
+        idler_angle=angle,
+    )
+
+    assert signal_wavelength == pytest.approx(
+        expected_signal_wavelength,
+        rel=1e-9,
+        abs=1e-15,
+    )
+    assert idler_wavelength == pytest.approx(
+        expected_idler_wavelength,
+        rel=1e-9,
+        abs=1e-15,
+    )
+
+
+def test_find_phase_matching_wavelength_pairs_with_angle() -> None:
+    material = MgOLithiumNiobate()
+    axis = RefractiveIndexAxis.EXTRAORDINARY
+    angle = np.deg2rad(80.0)
+    pump_wavelength = 775e-9
+    expected_signal_wavelength = 1200e-9
+    expected_idler_wavelength = conjugate_wavelength(
+        pump_wavelength,
+        expected_signal_wavelength,
+    )
+    temperature = 100.0
+
+    poling_period = find_poling_period(
+        pump_wavelength=pump_wavelength,
+        signal_wavelength=expected_signal_wavelength,
+        idler_wavelength=expected_idler_wavelength,
+        temperature=temperature,
+        material=material,
+        pump_axis=axis,
+        signal_axis=axis,
+        idler_axis=axis,
+        pump_angle=angle,
+        signal_angle=angle,
+        idler_angle=angle,
+    )
+
+    pairs = find_phase_matching_wavelength_pairs(
+        pump_wavelength=pump_wavelength,
+        temperature=temperature,
+        poling_period=poling_period,
+        material=material,
+        pump_axis=axis,
+        signal_axis=axis,
+        idler_axis=axis,
+        signal_wavelength_bounds=(1000e-9, 3000e-9),
+        pump_angle=angle,
+        signal_angle=angle,
+        idler_angle=angle,
+    )
+
+    matches = (
+        np.isclose(
+            pairs[:, 0],
+            expected_signal_wavelength,
+            rtol=1e-9,
+            atol=1e-15,
+        )
+        & np.isclose(
+            pairs[:, 1],
+            expected_idler_wavelength,
+            rtol=1e-9,
+            atol=1e-15,
+        )
+    )
+
+    assert np.any(matches)

@@ -453,6 +453,9 @@ def find_poling_period(
     signal_axis: RefractiveIndexAxis,
     idler_axis: RefractiveIndexAxis,
     qpm_order: int = 1,
+    pump_angle: typing.Optional[float] = None,
+    signal_angle: typing.Optional[float] = None,
+    idler_angle: typing.Optional[float] = None,
 ) -> typing.Union[
     float,
     npt.NDArray[np.float64],
@@ -505,28 +508,43 @@ def find_poling_period(
         Refractive-index axis of the idler.
     qpm_order
         Quasi-phase-matching order. Default is 1.
+    pump_angle
+        Optional pump propagation angle relative to the optic axis,
+        in radians.
+    signal_angle
+        Optional signal propagation angle relative to the optic axis,
+        in radians.
+    idler_angle
+        Optional idler propagation angle relative to the optic axis,
+        in radians.
 
     Returns
     -------
     float or numpy.ndarray
         Required poling period at 19 degrees Celsius, in metres.
     """
-    n_p = material.refractive_index(
-        pump_wavelength,
-        temperature,
-        pump_axis,
+    n_p = _material_refractive_index(
+        wavelength=pump_wavelength,
+        temperature=temperature,
+        material=material,
+        axis=pump_axis,
+        angle=pump_angle,
     )
 
-    n_s = material.refractive_index(
-        signal_wavelength,
-        temperature,
-        signal_axis,
+    n_s = _material_refractive_index(
+        wavelength=signal_wavelength,
+        temperature=temperature,
+        material=material,
+        axis=signal_axis,
+        angle=signal_angle,
     )
 
-    n_i = material.refractive_index(
-        idler_wavelength,
-        temperature,
-        idler_axis,
+    n_i = _material_refractive_index(
+        wavelength=idler_wavelength,
+        temperature=temperature,
+        material=material,
+        axis=idler_axis,
+        angle=idler_angle,
     )
 
     k_p = wavevector(
@@ -566,6 +584,9 @@ def _temperature_mismatch(
     signal_axis: RefractiveIndexAxis,
     idler_axis: RefractiveIndexAxis,
     qpm_order: int,
+    pump_angle: typing.Optional[float],
+    signal_angle: typing.Optional[float],
+    idler_angle: typing.Optional[float],
 ) -> float:
     return float(
         wavevector_mismatch(
@@ -579,6 +600,9 @@ def _temperature_mismatch(
             signal_axis=signal_axis,
             idler_axis=idler_axis,
             qpm_order=qpm_order,
+            pump_angle=pump_angle,
+            signal_angle=signal_angle,
+            idler_angle=idler_angle,
         )
     )
 
@@ -597,6 +621,9 @@ def find_phase_matching_temperature(
         float,
     ] = (20.0, 200.0),
     qpm_order: int = 1,
+    pump_angle: typing.Optional[float] = None,
+    signal_angle: typing.Optional[float] = None,
+    idler_angle: typing.Optional[float] = None,
 ) -> float:
     r"""
     Find the temperature required for quasi-phase matching.
@@ -645,6 +672,15 @@ def find_phase_matching_temperature(
         in degrees Celsius. Default is 20 to 200 degrees Celsius.
     qpm_order
         Quasi-phase-matching order. Default is 1.
+    pump_angle
+        Optional pump propagation angle relative to the optic axis,
+        in radians.
+    signal_angle
+        Optional signal propagation angle relative to the optic axis,
+        in radians.
+    idler_angle
+        Optional idler propagation angle relative to the optic axis,
+        in radians.
 
     Returns
     -------
@@ -671,6 +707,9 @@ def find_phase_matching_temperature(
             signal_axis=signal_axis,
             idler_axis=idler_axis,
             qpm_order=qpm_order,
+            pump_angle=pump_angle,
+            signal_angle=signal_angle,
+            idler_angle=idler_angle,
         )
 
     lower_temperature, upper_temperature = temperature_bounds
@@ -712,6 +751,9 @@ def find_phase_matching_temperatures(
     ] = (20.0, 200.0),
     qpm_order: int = 1,
     samples: int = 1000,
+    pump_angle: typing.Optional[float] = None,
+    signal_angle: typing.Optional[float] = None,
+    idler_angle: typing.Optional[float] = None,
 ) -> npt.NDArray[np.float64]:
     r"""
     Find phase-matching temperatures within an interval.
@@ -752,6 +794,15 @@ def find_phase_matching_temperatures(
     samples
         Number of temperatures used to search for root brackets.
         Default is 1000.
+    pump_angle
+        Optional pump propagation angle relative to the optic axis,
+        in radians.
+    signal_angle
+        Optional signal propagation angle relative to the optic axis,
+        in radians.
+    idler_angle
+        Optional idler propagation angle relative to the optic axis,
+        in radians.
 
     Returns
     -------
@@ -794,6 +845,9 @@ def find_phase_matching_temperatures(
             signal_axis=signal_axis,
             idler_axis=idler_axis,
             qpm_order=qpm_order,
+            pump_angle=pump_angle,
+            signal_angle=signal_angle,
+            idler_angle=idler_angle,
         )
 
     temperatures = np.linspace(
@@ -850,6 +904,9 @@ def find_phase_matching_wavelengths(
         float,
     ],
     qpm_order: int = 1,
+    pump_angle: typing.Optional[float] = None,
+    signal_angle: typing.Optional[float] = None,
+    idler_angle: typing.Optional[float] = None,
 ) -> typing.Tuple[float, float]:
     r"""
     Find signal and idler wavelengths satisfying energy conservation
@@ -907,6 +964,15 @@ def find_phase_matching_wavelengths(
         wavelength.
     qpm_order
         Quasi-phase-matching order. Default is 1.
+    pump_angle
+        Optional pump propagation angle relative to the optic axis,
+        in radians.
+    signal_angle
+        Optional signal propagation angle relative to the optic axis,
+        in radians.
+    idler_angle
+        Optional idler propagation angle relative to the optic axis,
+        in radians.
 
     Returns
     -------
@@ -953,6 +1019,9 @@ def find_phase_matching_wavelengths(
                 signal_axis=signal_axis,
                 idler_axis=idler_axis,
                 qpm_order=qpm_order,
+                pump_angle=pump_angle,
+                signal_angle=signal_angle,
+                idler_angle=idler_angle,
             )
         )
 
@@ -973,6 +1042,9 @@ def find_phase_matching_wavelengths(
             signal_axis=signal_axis,
             idler_axis=idler_axis,
             qpm_order=qpm_order,
+            pump_angle=pump_angle,
+            signal_angle=signal_angle,
+            idler_angle=idler_angle,
         )
 
         if np.isclose(
@@ -1029,6 +1101,9 @@ def find_phase_matching_wavelength_pairs(
     ],
     qpm_order: int = 1,
     samples: int = 1000,
+    pump_angle: typing.Optional[float] = None,
+    signal_angle: typing.Optional[float] = None,
+    idler_angle: typing.Optional[float] = None,
 ) -> npt.NDArray[np.float64]:
     r"""
     Find phase-matched signal and idler wavelength pairs.
@@ -1089,6 +1164,15 @@ def find_phase_matching_wavelength_pairs(
     samples
         Number of signal wavelengths used to search for root
         brackets. Default is 1000.
+    pump_angle
+        Optional pump propagation angle relative to the optic axis,
+        in radians.
+    signal_angle
+        Optional signal propagation angle relative to the optic axis,
+        in radians.
+    idler_angle
+        Optional idler propagation angle relative to the optic axis,
+        in radians.
 
     Returns
     -------
@@ -1149,6 +1233,9 @@ def find_phase_matching_wavelength_pairs(
                 signal_axis=signal_axis,
                 idler_axis=idler_axis,
                 qpm_order=qpm_order,
+                pump_angle=pump_angle,
+                signal_angle=signal_angle,
+                idler_angle=idler_angle,
             )
         )
 
@@ -1213,6 +1300,9 @@ def find_phase_matching_wavelength_pairs(
             signal_axis=signal_axis,
             idler_axis=idler_axis,
             qpm_order=qpm_order,
+            pump_angle=pump_angle,
+            signal_angle=signal_angle,
+            idler_angle=idler_angle,
         )
 
         if np.isclose(
