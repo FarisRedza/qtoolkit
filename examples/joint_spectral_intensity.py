@@ -28,6 +28,59 @@ from qtoolkit.spdc import (
     pump_wavelength_fwhm_to_angular_frequency_std,
 )
 
+def fwhm(
+    x: np.ndarray,
+    y: np.ndarray,
+) -> float:
+    """Calculate the FWHM of a sampled distribution."""
+    y = y / np.max(y)
+
+    above_half_maximum = np.flatnonzero(
+        y >= 0.5
+    )
+
+    if len(above_half_maximum) < 2:
+        raise ValueError(
+            'Insufficient samples to determine FWHM.'
+        )
+
+    left = above_half_maximum[0]
+    right = above_half_maximum[-1]
+
+    if left == 0 or right == len(y) - 1:
+        raise ValueError(
+            'Distribution does not fall below half maximum '
+            'within the sampled range.'
+        )
+
+    left_crossing = np.interp(
+        0.5,
+        [
+            y[left - 1],
+            y[left],
+        ],
+        [
+            x[left - 1],
+            x[left],
+        ],
+    )
+
+    right_crossing = np.interp(
+        0.5,
+        [
+            y[right + 1],
+            y[right],
+        ],
+        [
+            x[right + 1],
+            x[right],
+        ],
+    )
+
+    return float(
+        right_crossing
+        - left_crossing
+    )
 
 def main() -> None:
     material = MgOLithiumNiobate()
@@ -94,13 +147,13 @@ def main() -> None:
     idler_wavelengths = np.linspace(
         783e-9,
         787e-9,
-        500,
+        1000,
     )
 
     signal_wavelengths = np.linspace(
         1566e-9,
         1578e-9,
-        500,
+        1000,
     )
 
     idler_grid, signal_grid = np.meshgrid(
@@ -134,6 +187,46 @@ def main() -> None:
 
     # Normalise for plotting.
     jsi /= np.max(jsi)
+    # Calculate wavelength-domain marginal spectra.
+    idler_spectrum = np.trapezoid(
+        jsi,
+        signal_wavelengths,
+        axis=0,
+    )
+
+    signal_spectrum = np.trapezoid(
+        jsi,
+        idler_wavelengths,
+        axis=1,
+    )
+
+    idler_spectrum /= np.max(
+        idler_spectrum
+    )
+
+    signal_spectrum /= np.max(
+        signal_spectrum
+    )
+
+    idler_fwhm = fwhm(
+        idler_wavelengths,
+        idler_spectrum,
+    )
+
+    signal_fwhm = fwhm(
+        signal_wavelengths,
+        signal_spectrum,
+    )
+
+    print(
+        'Idler FWHM: '
+        f'{idler_fwhm * 1e9:.3f} nm'
+    )
+
+    print(
+        'Signal FWHM: '
+        f'{signal_fwhm * 1e9:.3f} nm'
+    )
 
     # Find the location of the maximum as a simple numerical check.
     maximum_index = np.unravel_index(
