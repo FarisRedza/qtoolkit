@@ -4,10 +4,13 @@ Calculate the joint spectral intensity of an SPDC source.
 This example models a non-degenerate type-0 SPDC source using a
 20 mm, 5% MgO-doped periodically poled lithium niobate crystal.
 
-The source is pumped at 523.5 nm and is phase matched for photon pairs
-near 785 nm and 1572 nm. The crystal propagation angle required for
-phase matching is calculated before evaluating the joint spectral
-amplitude.
+The source is pumped at 523.5 nm and modelled as phase matched for
+photon pairs near 785 nm and 1572 nm. An effective common propagation
+angle is calculated such that the Sellmeier and quasi-phase-matching
+model is phase matched at these target wavelengths.
+
+The calculated angle is a model parameter and should not be
+interpreted as an experimentally measured crystal orientation.
 
 The joint spectral intensity (JSI) is then plotted as a function of
 signal and idler wavelength.
@@ -108,8 +111,9 @@ def main() -> None:
         idler_centre,
     )
 
-    # Determine the common propagation angle that satisfies the
-    # quasi-phase-matching condition at the central wavelengths.
+    # Determine an effective common propagation angle that makes the
+    # model satisfy the quasi-phase-matching condition at the target
+    # central wavelengths.
     angle = find_phase_matching_angle(
         pump_wavelength=pump_wavelength,
         signal_wavelength=signal_centre,
@@ -187,7 +191,13 @@ def main() -> None:
 
     # Normalise for plotting.
     jsi /= np.max(jsi)
-    # Calculate wavelength-domain marginal spectra.
+    # Integrate the sampled JSI over each wavelength coordinate to obtain
+    # wavelength-domain marginal curves for this plotted representation.
+    # The underlying JSA is defined in angular-frequency space. A rigorous
+    # transformation of a spectral probability density from frequency to
+    # wavelength additionally introduces the appropriate Jacobian.
+    # Across the narrow wavelength ranges considered here this has only a
+    # small effect on the reported FWHM.
     idler_spectrum = np.trapezoid(
         jsi,
         signal_wavelengths,
