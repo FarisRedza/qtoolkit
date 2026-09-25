@@ -606,13 +606,13 @@ def pump_wavelength_fwhm_to_angular_frequency_std(
         upper_wavelength
     )
 
-    intensity_fwhm = (
+    equivalent_angular_frequency_fwhm = (
         upper_angular_frequency
         - lower_angular_frequency
     )
 
     return float(
-        intensity_fwhm
+        equivalent_angular_frequency_fwhm
         / (
             2
             * np.sqrt(np.log(2))
