@@ -331,6 +331,99 @@ def test_count_coincidences_empty_pairs() -> None:
     assert result == {}
 
 
+def test_count_coincidences_accepts_tuple_pairs() -> None:
+    data = timetags.TimetagData(
+        timetags=np.array([
+            1000,
+            1050,
+        ]),
+        channels=np.array([
+            0,
+            1,
+        ]),
+    )
+
+    result = timetags.count_coincidences(
+        data=data,
+        pairs=[
+            (0, 1),
+        ],
+        coincidence_window=100,
+    )
+
+    assert result == {
+        (0, 1): 1,
+    }
+
+
+def test_count_coincidences_accepts_generator() -> None:
+    data = timetags.TimetagData(
+        timetags=np.array([
+            1000,
+            1050,
+            2000,
+            2050,
+        ]),
+        channels=np.array([
+            0,
+            1,
+            0,
+            2,
+        ]),
+    )
+
+    pairs = (
+        timetags.ChannelPair(*pair)
+        for pair in [
+            (0, 1),
+            (0, 2),
+        ]
+    )
+
+    result = timetags.count_coincidences(
+        data=data,
+        pairs=pairs,
+        coincidence_window=100,
+    )
+
+    assert result == {
+        (0, 1): 1,
+        (0, 2): 1,
+    }
+
+
+def test_private_count_coincidences_accepts_generator() -> None:
+    pairs = (
+        pair
+        for pair in [
+            (0, 1),
+            (0, 2),
+        ]
+    )
+
+    result = timetags.coincidences._count_coincidences(
+        timetags=[
+            1000,
+            1050,
+            2000,
+            2050,
+        ],
+        channels=[
+            0,
+            1,
+            0,
+            2,
+        ],
+        pairs=pairs,
+        coincidence_window=100,
+    )
+
+    assert result == {
+        (0, 1): 1,
+        (0, 2): 1,
+    }
+
+
 def test_count_coincidences_rejects_non_1d_timetags() -> None:
     with pytest.raises(
         ValueError,

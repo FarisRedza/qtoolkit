@@ -341,6 +341,7 @@ def _count_coincidences(
 
     timetags = np.asarray(timetags, dtype=np.int64)
     channels = np.asarray(channels, dtype=np.int64)
+    pairs = list(pairs)
 
     if timetags.ndim != 1:
         raise ValueError('Timetags must be a 1D array.')
@@ -379,7 +380,12 @@ def _count_coincidences(
 
 def count_coincidences(
     data: TimetagData,
-    pairs: typing.Iterable[ChannelPair],
+    pairs: typing.Iterable[
+        typing.Union[
+            ChannelPair,
+            tuple[int, int],
+        ]
+    ],
     coincidence_window: int,
 ) -> dict[tuple[int, int], int]:
     """
@@ -390,7 +396,7 @@ def count_coincidences(
     data: TimetagData
         Timetag data.
 
-    pairs: list[tuple[int, int]]
+    pairs: iterable of ChannelPair or tuple[int, int]
         Channel pairs for which coincidences should be calculated.
 
     coincidence_window: int
@@ -401,14 +407,17 @@ def count_coincidences(
     dict
         Mapping ``(channel_a, channel_b)`` to coincidence count.
     """
-    for i, p in enumerate(pairs):
-        if isinstance(p,ChannelPair):
-            pairs[i] = p.as_tuple()
+    pair_tuples = [
+        pair.as_tuple()
+        if isinstance(pair, ChannelPair)
+        else pair
+        for pair in pairs
+    ]
 
     coincidences = _count_coincidences(
         timetags=data.timetags,
         channels=data.channels,
-        pairs=pairs,
+        pairs=pair_tuples,
         coincidence_window=coincidence_window
     )
 
