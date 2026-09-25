@@ -1,10 +1,16 @@
 """
-Calculate and plot the joint spectral intensity of an SPDC source.
+Calculate the joint spectral intensity of an SPDC source.
 
-Unlike the one-dimensional phase-matching spectrum, the JSI includes
-both the finite pump spectrum and the crystal phase-matching function.
-The result shows the spectral correlations between the generated
-signal and idler photons.
+This example models a non-degenerate type-0 SPDC source using a
+20 mm, 5% MgO-doped periodically poled lithium niobate crystal.
+
+The source is pumped at 523.5 nm and is phase matched for photon pairs
+near 785 nm and 1572 nm. The crystal propagation angle required for
+phase matching is calculated before evaluating the joint spectral
+amplitude.
+
+The joint spectral intensity (JSI) is then plotted as a function of
+signal and idler wavelength.
 """
 
 import pathlib
@@ -12,60 +18,98 @@ import pathlib
 import matplotlib.pyplot as plt
 import numpy as np
 
-from qtoolkit.spdc.materials import (
+from qtoolkit.spdc import (
     MgOLithiumNiobate,
     RefractiveIndexAxis,
-)
-from qtoolkit.spdc.phasematching import (
-    find_phase_matching_wavelength_pairs,
-)
-from qtoolkit.spdc.spectral import (
+    conjugate_wavelength,
+    find_phase_matching_angle,
     joint_spectral_amplitude,
     joint_spectral_intensity,
+    pump_wavelength_fwhm_to_angular_frequency_std,
 )
 
 
 def main() -> None:
     material = MgOLithiumNiobate()
+    axis = RefractiveIndexAxis.EXTRAORDINARY
 
+    # Source parameters.
     pump_wavelength = 523.5e-9
-    temperature = 84.0
-    poling_period = 7.15e-6
+    pump_wavelength_fwhm = 92e-12
+
     crystal_length = 20e-3
+    temperature = 84.0
 
-    # Gaussian pump amplitude bandwidth in rad/s.
-    pump_bandwidth_std = 2.5e11
+    # Poling period at the 19 degrees Celsius reference temperature
+    # used by qtoolkit's thermal-expansion model.
+    poling_period = 7.15e-6
 
-    pairs = find_phase_matching_wavelength_pairs(
+    # Type-0 e -> e + e SPDC is considered.
+    #
+    # Specify the short-wavelength photon and determine its
+    # energy-conserving conjugate.
+    idler_centre = 785e-9
+
+    signal_centre = conjugate_wavelength(
+        pump_wavelength,
+        idler_centre,
+    )
+
+    # Determine the common propagation angle that satisfies the
+    # quasi-phase-matching condition at the central wavelengths.
+    angle = find_phase_matching_angle(
         pump_wavelength=pump_wavelength,
+        signal_wavelength=signal_centre,
+        idler_wavelength=idler_centre,
         temperature=temperature,
         poling_period=poling_period,
         material=material,
-        pump_axis=RefractiveIndexAxis.EXTRAORDINARY,
-        signal_axis=RefractiveIndexAxis.EXTRAORDINARY,
-        idler_axis=RefractiveIndexAxis.EXTRAORDINARY,
-        signal_wavelength_bounds=(700e-9,2e-6)
+        pump_axis=axis,
+        signal_axis=axis,
+        idler_axis=axis,
     )
 
-    signal_centre, idler_centre = pairs[0]
+    print(
+        'Central wavelengths: '
+        f'{idler_centre * 1e9:.3f} nm, '
+        f'{signal_centre * 1e9:.3f} nm'
+    )
+
+    print(
+        'Phase-matching angle: '
+        f'{np.rad2deg(angle):.6f} degrees'
+    )
+
+    # Convert the measured pump intensity FWHM in wavelength to the
+    # angular-frequency amplitude standard deviation expected by the
+    # JSA calculation.
+    pump_bandwidth_std = (
+        pump_wavelength_fwhm_to_angular_frequency_std(
+            pump_wavelength,
+            pump_wavelength_fwhm,
+        )
+    )
+
+    # Spectral ranges surrounding the phase-matched wavelengths.
+    idler_wavelengths = np.linspace(
+        783e-9,
+        787e-9,
+        500,
+    )
 
     signal_wavelengths = np.linspace(
-        signal_centre - 4e-9,
-        signal_centre + 4e-9,
+        1566e-9,
+        1578e-9,
         500,
     )
 
-    idler_wavelengths = np.linspace(
-        idler_centre - 15e-9,
-        idler_centre + 15e-9,
-        500,
-    )
-
-    signal_grid, idler_grid = np.meshgrid(
-        signal_wavelengths,
+    idler_grid, signal_grid = np.meshgrid(
         idler_wavelengths,
+        signal_wavelengths,
+        indexing='xy',
     )
 
+    # Calculate the joint spectral amplitude.
     jsa = joint_spectral_amplitude(
         signal_wavelength=signal_grid,
         idler_wavelength=idler_grid,
@@ -75,39 +119,75 @@ def main() -> None:
         temperature=temperature,
         poling_period=poling_period,
         material=material,
-        pump_axis=RefractiveIndexAxis.EXTRAORDINARY,
-        signal_axis=RefractiveIndexAxis.EXTRAORDINARY,
-        idler_axis=RefractiveIndexAxis.EXTRAORDINARY,
+        pump_axis=axis,
+        signal_axis=axis,
+        idler_axis=axis,
+        pump_angle=angle,
+        signal_angle=angle,
+        idler_angle=angle,
     )
 
+    # The joint spectral intensity is |JSA|^2.
     jsi = joint_spectral_intensity(
         jsa
     )
 
+    # Normalise for plotting.
     jsi /= np.max(jsi)
 
+    # Find the location of the maximum as a simple numerical check.
+    maximum_index = np.unravel_index(
+        np.argmax(jsi),
+        jsi.shape,
+    )
+
+    peak_idler = (
+        idler_grid[maximum_index]
+    )
+
+    peak_signal = (
+        signal_grid[maximum_index]
+    )
+
+    print(
+        'JSI maximum: '
+        f'{peak_idler * 1e9:.3f} nm, '
+        f'{peak_signal * 1e9:.3f} nm'
+    )
+
+    # Plot the JSI.
     fig, ax = plt.subplots(
         constrained_layout=True,
     )
 
     image = ax.pcolormesh(
-        signal_wavelengths * 1e9,
         idler_wavelengths * 1e9,
+        signal_wavelengths * 1e9,
         jsi,
-        shading="auto",
+        shading='auto',
+    )
+
+    ax.plot(
+        idler_centre * 1e9,
+        signal_centre * 1e9,
+        marker='x',
+        linestyle='none',
+        label='Phase-matched centre',
     )
 
     ax.set(
-        xlabel="Signal wavelength (nm)",
-        ylabel="Idler wavelength (nm)",
-        title="Joint spectral intensity",
+        xlabel='Idler wavelength (nm)',
+        ylabel='Signal wavelength (nm)',
+        title='Joint spectral intensity',
     )
 
     fig.colorbar(
         image,
         ax=ax,
-        label="Normalised JSI",
+        label='Normalised JSI',
     )
+
+    ax.legend()
 
     plt.show()
     fig.savefig(
@@ -116,5 +196,5 @@ def main() -> None:
         bbox_inches='tight',
     )
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
