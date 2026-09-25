@@ -283,32 +283,45 @@ def fidelity_from_visibility(
         visibility_y: typing.Optional[float] = None
 ) -> float:
     r"""
-    Estimate Bell-state fidelity from measured visibilities.
+    Fidelity with :math:`|\Phi^+\rangle` from basis correlations.
 
-    With measurements in all three mutually unbiased bases:
-
-    .. math::
-        F ~= (1 + V_x + V_y + V_z) / 4
-
-    If only X and Z are supplied, this function returns the common
-    two-basis estimate:
+    The inputs use the signed-correlation convention used by
+    :func:`visibility_from_qber`,
 
     .. math::
-        F ~= (V_x + V_z) / 2
+        V_i = 1 - 2Q_i = \langle \sigma_i \otimes \sigma_i \rangle.
+
+    For :math:`|\Phi^+\rangle`, the ideal correlations are
+    :math:`V_x=+1`, :math:`V_y=-1`, and :math:`V_z=+1`.  If all three
+    correlations are supplied, the Bell-state projector gives
+
+    .. math::
+        F_{\Phi^+} = (1 + V_x - V_y + V_z) / 4.
+
+    If only X and Z are supplied, the function returns the two-basis
+    lower bound
+
+    .. math::
+        F_{\Phi^+} \ge (V_x + V_z) / 2.
+
+    This function therefore does not accept an unsigned fringe contrast for
+    ``visibility_y``.  For a :math:`|\Phi^+\rangle` source, an ideal Y-basis
+    measurement has ``visibility_y=-1`` under this convention.
 
     Parameters
     ----------
-    visibility_z: float
-        Visibility in the Z basis
-    visibility_x: float
-        Visibility in the X basis
-    visibility_y: float
-        Visibility in the Y basis
-    
+    visibility_z : float
+        Signed Z-basis correlation.
+    visibility_x : float
+        Signed X-basis correlation.
+    visibility_y : float, optional
+        Signed Y-basis correlation.
+
     Returns
     -------
     float
-        Fidelity
+        Exact :math:`|\Phi^+\rangle` fidelity when all three correlations
+        are supplied; otherwise the X/Z lower bound.
     """
     if visibility_y is None:
         return (visibility_x + visibility_z) / 2
@@ -316,7 +329,7 @@ def fidelity_from_visibility(
     return (
         1
         + visibility_x
-        + visibility_y
+        - visibility_y
         + visibility_z
     ) / 4
 
@@ -325,13 +338,19 @@ def fidelity_from_qber(
     qz: float,
 ) -> float:
     r"""
-    Two-basis Bell-state fidelity estimate.
+    Two-basis lower bound on :math:`|\Phi^+\rangle` fidelity.
+
+    For QBERs defined relative to the correlated outcomes expected from
+    :math:`|\Phi^+\rangle` in the X and Z bases,
 
     .. math::
-        V = 1 - 2 * \text{QBER}
+        V_i = 1 - 2Q_i,
 
-        F ~= (V_x + V_z) / 2 \\
-           = 1 - Q_x - Q_z
+    which gives the lower bound
+
+    .. math::
+        F_{\Phi^+} \ge (V_x + V_z) / 2
+        = 1 - Q_x - Q_z.
     """
     return 1 - qx - qz
 
