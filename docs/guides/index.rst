@@ -5,4 +5,5 @@ Guides
    :maxdepth: 2
    :caption: Contents:
 
+   spdc
    examples/index
