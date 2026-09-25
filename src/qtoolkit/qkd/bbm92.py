@@ -110,6 +110,7 @@ class BBM92Metrics:
 
     @property
     def fidelity(self) -> float:
+        r"""Two-basis lower bound on :math:`|\Phi^+\rangle` fidelity."""
         return fidelity_from_visibility(
             visibility_z=self.zz.visibility,
             visibility_x=self.xx.visibility
@@ -128,7 +129,7 @@ class BBM92Metrics:
             f'{"Prob":>10}'
             f'{"QBER":>10}'
             f'{"Vis":>10}'
-            f'{"Fid approx":>12}'
+            f'{"Fid lower":>12}'
         )
 
         rows = []
