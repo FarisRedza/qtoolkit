@@ -1,5 +1,5 @@
-Spectal
-=======
+Spectral
+========
 
 Spectral
 
