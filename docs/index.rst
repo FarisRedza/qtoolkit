@@ -27,6 +27,9 @@ qtoolkit currently provides tools for:
 * **QKD modelling** -- analytical tools for modelling entanglement-based QKD
   systems, including detector noise, accidental coincidences, timing
   imprecision, and channel loss.
+* **SPDC modelling** -- nonlinear-material dispersion, periodically
+  poled crystal phase matching, angular phase matching, and joint
+  spectral amplitude and intensity calculations.
 
 Getting started
 ---------------

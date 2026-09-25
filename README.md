@@ -12,6 +12,9 @@ Current functionality includes:
 - Functions for calculating common experimental quantities such as QBER, visibility, fidelity, and purity
 - Tools for modelling quantum key distribution (QKD) systems
 - Tools for working with polarisation states and optical components
+- Tools for modelling SPDC sources, including nonlinear-material
+  dispersion, quasi-phase matching, phase-matching conditions, and
+  joint spectral amplitudes and intensities
 
 ## Installation
 
@@ -171,14 +174,19 @@ The main package is organised into modules covering different parts of the toolk
 
 ```text
 qtoolkit
+├── loss
 ├── polarisation
 ├── qkd
+├── spdc
 └── timetags
 ```
 
 * **`polarisation`** contains tools for working with polarisation states and optical components.
 * **`qkd`** contains QKD metrics, protocol-related tools, and analytical models.
 * **`timetags`** contains tools for processing, correlating, and simulating timetag data.
+* **`loss`** contains models for optical loss and atmospheric propagation.
+* **`spdc`** contains nonlinear-material models, phase-matching tools,
+  and spectral models for SPDC sources.
 
 Examples demonstrating the use of qtoolkit can be found in the `examples/` directory.
 
