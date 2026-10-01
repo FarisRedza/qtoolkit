@@ -9,9 +9,6 @@ photon pairs near 785 nm and 1572 nm. An effective common propagation
 angle is calculated such that the Sellmeier and quasi-phase-matching
 model is phase matched at these target wavelengths.
 
-The calculated angle is a model parameter and should not be
-interpreted as an experimentally measured crystal orientation.
-
 The joint spectral intensity (JSI) is then plotted as a function of
 signal and idler wavelength.
 """
@@ -191,13 +188,9 @@ def main() -> None:
 
     # Normalise for plotting.
     jsi /= np.max(jsi)
+
     # Integrate the sampled JSI over each wavelength coordinate to obtain
     # wavelength-domain marginal curves for this plotted representation.
-    # The underlying JSA is defined in angular-frequency space. A rigorous
-    # transformation of a spectral probability density from frequency to
-    # wavelength additionally introduces the appropriate Jacobian.
-    # Across the narrow wavelength ranges considered here this has only a
-    # small effect on the reported FWHM.
     idler_spectrum = np.trapezoid(
         jsi,
         signal_wavelengths,
