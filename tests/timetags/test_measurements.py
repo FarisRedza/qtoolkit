@@ -63,3 +63,64 @@ def test_invalid_counts(kwargs):
     fields.update(kwargs)
     with pytest.raises(ValueError):
         MeasurementCounts(**fields)
+
+
+from pathlib import Path
+from qtoolkit.timetags import aggregate_measurements
+
+
+def _result(correct=0, incorrect=0, *, duration=1.0, window=50, path=None):
+    return MeasurementCounts(
+        singles={0: correct + incorrect, 1: 0, 2: correct + incorrect},
+        coincidences={(0, 2): correct, (0, 3): incorrect, (1, 2): 0, (1, 3): 0},
+        duration_s=duration,
+        coincidence_window_ps=window,
+        file_path=path,
+    )
+
+
+def test_aggregation_sums_counts_not_qber():
+    from qtoolkit.timetags import ChannelPair
+    first = _result(900, 100)
+    second = _result(1, 9)
+    combined = aggregate_measurements([first, second])
+    pairs = tuple(ChannelPair(*pair) for pair in combined.coincidences)
+    assert combined.coincidences[(0, 2)] == 901
+    assert combined.coincidences[(0, 3)] == 109
+    assert combined.get_basis_metrics(pairs).qber == pytest.approx(109 / 1010)
+    assert combined.duration_s == 2.0
+    assert first.coincidences[(0, 2)] == 900
+
+
+def test_aggregation_preserves_source_paths_and_missing_duration():
+    first = _result(path=Path('first.csv'))
+    second = _result(duration=None, path=Path('second.csv'))
+    combined = aggregate_measurements((first, second))
+    assert combined.duration_s is None
+    assert combined.file_path is None
+    assert combined.source_file_paths == (Path('first.csv'), Path('second.csv'))
+    assert aggregate_measurements([combined, first]).source_file_paths == (
+        Path('first.csv'), Path('second.csv'), Path('first.csv')
+    )
+
+
+@pytest.mark.parametrize('changed', [
+    {'coincidence_window_ps': 51},
+    {'singles': {0: 0, 2: 0}},
+    {'coincidences': {(0, 2): 0, (0, 3): 0, (1, 2): 0}},
+])
+def test_aggregation_rejects_incompatible_measurements(changed):
+    first = _result()
+    second = dataclasses.replace(first, **changed)
+    with pytest.raises(ValueError):
+        aggregate_measurements([first, second])
+
+
+def test_aggregation_accepts_measured_zero_and_rejects_empty():
+    combined = aggregate_measurements([_result(), _result()])
+    assert set(combined.coincidences) == {(0, 2), (0, 3), (1, 2), (1, 3)}
+    assert all(value == 0 for value in combined.coincidences.values())
+    with pytest.raises(ValueError):
+        aggregate_measurements([])
+    with pytest.raises(TypeError):
+        aggregate_measurements([_result(), object()])

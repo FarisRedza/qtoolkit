@@ -31,6 +31,7 @@ class MeasurementCounts:
     duration_s: typing.Optional[float]
     coincidence_window_ps: int
     file_path: typing.Optional[pathlib.Path] = None
+    source_file_paths: tuple[pathlib.Path, ...] = ()
 
     def __post_init__(self) -> None:
         singles = dict(self.singles)
@@ -47,6 +48,10 @@ class MeasurementCounts:
             raise ValueError('coincidence_window_ps must be a nonnegative integer.')
         if self.duration_s is not None and (not math.isfinite(self.duration_s) or self.duration_s < 0):
             raise ValueError('duration_s must be finite and nonnegative, or None.')
+        paths = tuple(pathlib.Path(path) for path in self.source_file_paths)
+        if self.file_path is not None and not paths:
+            paths = (pathlib.Path(self.file_path),)
+        object.__setattr__(self, 'source_file_paths', paths)
         object.__setattr__(self, 'singles', MappingProxyType(singles))
         object.__setattr__(self, 'coincidences', MappingProxyType(coincidences))
 
@@ -92,3 +97,51 @@ class MeasurementCounts:
         from ..qkd.metrics import BasisMetrics
 
         return BasisMetrics.from_coincidences(dict(self.coincidences), pairs)
+
+
+def aggregate_measurements(
+    results: typing.Iterable[MeasurementCounts],
+) -> MeasurementCounts:
+    """Sum compatible measurement counts before calculating derived metrics.
+
+    Requires identical measured singles channels, coincidence pair keys, and
+    coincidence-window widths. A missing key is not equivalent to a zero count.
+    Durations are summed only when *every* duration is known; otherwise the
+    combined duration is unknown. Source file paths are retained in order,
+    including duplicates. Physical detector mappings and acquisition settings
+    beyond the coincidence window must be checked by the caller.
+
+    The result's ``file_path`` is ``None`` because it represents multiple
+    acquisitions; use ``source_file_paths`` for source provenance.
+    """
+    results = tuple(results)
+    if not results:
+        raise ValueError('Cannot aggregate an empty collection of measurements.')
+    if any(not isinstance(result, MeasurementCounts) for result in results):
+        raise TypeError('All results must be MeasurementCounts instances.')
+
+    first = results[0]
+    singles_keys = set(first.singles)
+    coincidence_keys = set(first.coincidences)
+    for index, result in enumerate(results[1:], start=1):
+        if result.coincidence_window_ps != first.coincidence_window_ps:
+            raise ValueError(f'Measurement {index} has a different coincidence window.')
+        if set(result.singles) != singles_keys:
+            raise ValueError(f'Measurement {index} has different measured singles channels.')
+        if set(result.coincidences) != coincidence_keys:
+            raise ValueError(f'Measurement {index} has different measured coincidence pairs.')
+
+    duration = (
+        sum(result.duration_s for result in results if result.duration_s is not None)
+        if all(result.duration_s is not None for result in results)
+        else None
+    )
+    return MeasurementCounts(
+        singles={key: sum(result.singles[key] for result in results) for key in first.singles},
+        coincidences={key: sum(result.coincidences[key] for result in results) for key in first.coincidences},
+        duration_s=duration,
+        coincidence_window_ps=first.coincidence_window_ps,
+        source_file_paths=tuple(
+            path for result in results for path in result.source_file_paths
+        ),
+    )

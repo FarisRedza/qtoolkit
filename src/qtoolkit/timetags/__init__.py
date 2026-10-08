@@ -23,7 +23,7 @@ from .data import (
     ProcessedTimetagData,
 )
 
-from .measurements import MeasurementCounts
+from .measurements import MeasurementCounts, aggregate_measurements
 
 from .simulation import (
     CoincidenceProcess,
@@ -46,6 +46,7 @@ __all__ = [
     'TimetagData',
     'ProcessedTimetagData',
     'MeasurementCounts',
+    'aggregate_measurements',
 
     'CoincidenceProcess',
     'generate_timetags',
