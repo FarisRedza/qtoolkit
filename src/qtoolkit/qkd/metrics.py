@@ -206,12 +206,55 @@ def qy(
         correlated=correlated
     )
 
+def correlation_from_coincidences(
+        c_00: float,
+        c_01: float,
+        c_10: float,
+        c_11: float,
+) -> float:
+    r"""
+    Calculate the signed same-versus-different outcome correlation.
+
+    .. math::
+        C = \frac{(c_{00}+c_{11})-(c_{01}+c_{10})}
+                 {c_{00}+c_{01}+c_{10}+c_{11}}.
+
+    ``C=+1`` denotes perfectly correlated outcomes and ``C=-1`` denotes
+    perfectly anti-correlated outcomes.  Unlike a QBER-derived visibility,
+    the sign is not adjusted to make the expected outcome positive.
+    """
+    total = c_00 + c_01 + c_10 + c_11
+    if total == 0:
+        return float('nan')
+
+    return (c_00 + c_11 - c_01 - c_10) / total
+
+
+def correlation_from_qber(
+        qber: float,
+        correlated: bool = True,
+) -> float:
+    r"""Convert QBER to a signed same-versus-different correlation.
+
+    For a target with correlated outcomes, :math:`C=1-2Q`.  For a target
+    with anti-correlated outcomes, :math:`C=-(1-2Q)`.
+    """
+    target_sign = 1 if correlated else -1
+    return target_sign * (1 - 2 * qber)
+
+
 def qber_from_visibility(visibility: float) -> float:
     r"""
-    Calculate QBER from visibility
+    Calculate QBER from target-adjusted visibility.
 
-    .. math:: 
-        \text{QBER} = (1 - V)/2
+    Here ``visibility`` is positive for the expected outcome pattern, whether
+    that pattern is correlated or anti-correlated:
+
+    .. math::
+        \text{QBER} = (1 - V)/2.
+
+    It should not be confused with a signed same-versus-different correlation,
+    which is negative for ideal anti-correlated outcomes.
 
     Parameters
     ----------
@@ -249,10 +292,15 @@ def visibility(max: float, min: float) -> float:
 
 def visibility_from_qber(qber: float) -> float:
     r"""
-    Calculate visbility from QBER
+    Calculate target-adjusted visibility from QBER.
 
     .. math::
-        V = 1 - 2 * \text{QBER}
+        V = 1 - 2 * \text{QBER}.
+
+    Since QBER already defines which outcomes are correct, this quantity is
+    positive for an ideal target regardless of whether the expected outcomes
+    are correlated or anti-correlated.  Use :func:`correlation_from_qber` when
+    a signed same-versus-different correlation is required.
 
     Parameters
     ----------
@@ -277,44 +325,42 @@ def symmetric_heralding_efficiency(
 
 # entanglement functions
 
-def fidelity_from_visibility(
-        visibility_z: float,
-        visibility_x: float,
-        visibility_y: typing.Optional[float] = None
+def fidelity_from_correlations(
+        correlation_z: float,
+        correlation_x: float,
+        correlation_y: typing.Optional[float] = None
 ) -> float:
     r"""
     Fidelity with :math:`|\Phi^+\rangle` from basis correlations.
 
-    The inputs use the signed-correlation convention used by
-    :func:`visibility_from_qber`,
+    The inputs are signed same-versus-different correlations,
 
     .. math::
-        V_i = 1 - 2Q_i = \langle \sigma_i \otimes \sigma_i \rangle.
+        C_i = \langle \sigma_i \otimes \sigma_i \rangle.
 
     For :math:`|\Phi^+\rangle`, the ideal correlations are
-    :math:`V_x=+1`, :math:`V_y=-1`, and :math:`V_z=+1`.  If all three
+    :math:`C_x=+1`, :math:`C_y=-1`, and :math:`C_z=+1`.  If all three
     correlations are supplied, the Bell-state projector gives
 
     .. math::
-        F_{\Phi^+} = (1 + V_x - V_y + V_z) / 4.
+        F_{\Phi^+} = (1 + C_x - C_y + C_z) / 4.
 
     If only X and Z are supplied, the function returns the two-basis
     lower bound
 
     .. math::
-        F_{\Phi^+} \ge (V_x + V_z) / 2.
+        F_{\Phi^+} \ge (C_x + C_z) / 2.
 
-    This function therefore does not accept an unsigned fringe contrast for
-    ``visibility_y``.  For a :math:`|\Phi^+\rangle` source, an ideal Y-basis
-    measurement has ``visibility_y=-1`` under this convention.
+    These are correlations rather than unsigned fringe contrasts or
+    target-adjusted QBER visibilities.
 
     Parameters
     ----------
-    visibility_z : float
+    correlation_z : float
         Signed Z-basis correlation.
-    visibility_x : float
+    correlation_x : float
         Signed X-basis correlation.
-    visibility_y : float, optional
+    correlation_y : float, optional
         Signed Y-basis correlation.
 
     Returns
@@ -323,15 +369,37 @@ def fidelity_from_visibility(
         Exact :math:`|\Phi^+\rangle` fidelity when all three correlations
         are supplied; otherwise the X/Z lower bound.
     """
-    if visibility_y is None:
-        return (visibility_x + visibility_z) / 2
+    if correlation_y is None:
+        return (correlation_x + correlation_z) / 2
 
     return (
         1
-        + visibility_x
-        - visibility_y
-        + visibility_z
+        + correlation_x
+        - correlation_y
+        + correlation_z
     ) / 4
+
+
+def fidelity_from_visibility(
+        visibility_z: float,
+        visibility_x: float,
+        visibility_y: typing.Optional[float] = None,
+) -> float:
+    r"""
+    Backwards-compatible alias for :func:`fidelity_from_correlations`.
+
+    Despite the parameter names, the inputs are **signed basis
+    correlations**, not target-adjusted QBER visibilities or unsigned fringe
+    contrasts.  New code should use :func:`fidelity_from_correlations`.
+    
+    This will eventually be cleaned up.
+    """
+    return fidelity_from_correlations(
+        correlation_z=visibility_z,
+        correlation_x=visibility_x,
+        correlation_y=visibility_y,
+    )
+
 
 def fidelity_from_qber(
     qx: float,
@@ -482,20 +550,44 @@ class BasisMetrics:
 
         return self.odd / self.total
 
+    def qber_for(self, correlated: bool = True) -> float:
+        """Return QBER for the specified expected outcome parity."""
+        return qber_from_coincidences(
+            c_00=self.c_00,
+            c_01=self.c_01,
+            c_10=self.c_10,
+            c_11=self.c_11,
+            correlated=correlated,
+        )
+
     @property
     def qber(self) -> float:
-        return qber_from_coincidences(
+        """QBER assuming correlated outcomes are correct."""
+        return self.qber_for(correlated=True)
+
+    @property
+    def correlation(self) -> float:
+        """Signed same-versus-different outcome correlation."""
+        return correlation_from_coincidences(
             c_00=self.c_00,
             c_01=self.c_01,
             c_10=self.c_10,
             c_11=self.c_11,
         )
 
+    def visibility_for(self, correlated: bool = True) -> float:
+        """Return target-adjusted visibility for an expected parity."""
+        return visibility_from_qber(self.qber_for(correlated=correlated))
+
     @property
     def visibility(self) -> float:
-        return visibility_from_qber(
-            qber=self.qber,
-        )
+        """Historical alias for the signed correlation.
+
+        For the default correlated-target interpretation this is also equal to
+        ``1 - 2*qber``.  Prefer :attr:`correlation` when the sign matters or
+        :meth:`visibility_for` for target-adjusted visibility.
+        """
+        return self.correlation
 
     def as_row(self) -> list[typing.Union[int, float]]:
         return [

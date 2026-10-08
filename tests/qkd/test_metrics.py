@@ -441,3 +441,69 @@ def test_basis_metrics_as_row() -> None:
         0.05,
         0.9,
     ])
+
+def test_correlation_from_coincidences_correlated() -> None:
+    assert qtoolkit.qkd.correlation_from_coincidences(
+        c_00=450, c_01=25, c_10=25, c_11=500,
+    ) == pytest.approx(0.9)
+
+
+def test_correlation_from_coincidences_anticorrelated() -> None:
+    assert qtoolkit.qkd.correlation_from_coincidences(
+        c_00=25, c_01=450, c_10=500, c_11=25,
+    ) == pytest.approx(-0.9)
+
+
+def test_correlation_from_coincidences_empty() -> None:
+    assert np.isnan(qtoolkit.qkd.correlation_from_coincidences(0, 0, 0, 0))
+
+
+@pytest.mark.parametrize(
+    ('correlated', 'expected'),
+    [(True, 0.9), (False, -0.9)],
+)
+def test_correlation_from_qber(correlated: bool, expected: float) -> None:
+    assert qtoolkit.qkd.correlation_from_qber(
+        qber=0.05,
+        correlated=correlated,
+    ) == pytest.approx(expected)
+
+
+def test_basis_metrics_anticorrelated_semantics() -> None:
+    metrics = qtoolkit.qkd.BasisMetrics(
+        c_00=25,
+        c_01=450,
+        c_10=500,
+        c_11=25,
+    )
+
+    assert metrics.correlation == pytest.approx(-0.9)
+    assert metrics.qber_for(correlated=False) == pytest.approx(0.05)
+    assert metrics.visibility_for(correlated=False) == pytest.approx(0.9)
+
+    # The legacy properties retain their correlated-target interpretation.
+    assert metrics.qber == pytest.approx(0.95)
+    assert metrics.visibility == pytest.approx(-0.9)
+
+
+def test_fidelity_from_correlations_phi_plus() -> None:
+    assert qtoolkit.qkd.fidelity_from_correlations(
+        correlation_z=1.0,
+        correlation_x=1.0,
+        correlation_y=-1.0,
+    ) == pytest.approx(1.0)
+
+
+def test_fidelity_visibility_alias_uses_signed_correlations() -> None:
+    expected = qtoolkit.qkd.fidelity_from_correlations(
+        correlation_z=0.9,
+        correlation_x=0.8,
+        correlation_y=-0.7,
+    )
+    result = qtoolkit.qkd.fidelity_from_visibility(
+        visibility_z=0.9,
+        visibility_x=0.8,
+        visibility_y=-0.7,
+    )
+
+    assert result == pytest.approx(expected)

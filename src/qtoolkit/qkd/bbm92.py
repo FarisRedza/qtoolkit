@@ -11,7 +11,7 @@ from ..polarisation.channels import PolarisationChannelMap
 
 from .metrics import (
     BasisMetrics,
-    fidelity_from_visibility
+    fidelity_from_correlations
 )
 
 
@@ -111,9 +111,9 @@ class BBM92Metrics:
     @property
     def fidelity(self) -> float:
         r"""Two-basis lower bound on :math:`|\Phi^+\rangle` fidelity."""
-        return fidelity_from_visibility(
-            visibility_z=self.zz.visibility,
-            visibility_x=self.xx.visibility
+        return fidelity_from_correlations(
+            correlation_z=self.zz.correlation,
+            correlation_x=self.xx.correlation,
         )
 
     def __str__(self) -> str:
@@ -128,7 +128,7 @@ class BBM92Metrics:
             f'{"Total":>8}'
             f'{"Prob":>10}'
             f'{"QBER":>10}'
-            f'{"Vis":>10}'
+            f'{"Corr":>10}'
             f'{"Fid lower":>12}'
         )
 
@@ -155,7 +155,7 @@ class BBM92Metrics:
                 f'{metrics.total:>8}'
                 f'{metrics.even_probability:>10.6f}'
                 f'{metrics.qber:>10.6f}'
-                f'{metrics.visibility:>10.6f}'
+                f'{metrics.correlation:>10.6f}'
                 f'{fidelity:>12}'
             )
 
